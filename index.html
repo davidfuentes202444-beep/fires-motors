@@ -17,29 +17,29 @@
             <h1 class="text-2xl font-bold text-blue-800 flex items-center">
                 🎰 RIFAS VENEZUELA
             </h1>
-            <button id="btnAdmin" class="text-gray-400 hover:text-blue-600 text-2xl">🔑</button>
+            <button id="btnAdmin" class="text-transparent hover:text-blue-600 text-2xl">🔑</button>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
         <div id="adminPanel" class="hidden bg-white p-6 rounded-lg shadow-lg mb-8 border-2 border-blue-100">
-            <h2 class="text-xl font-bold mb-4 border-b pb-2">Panel de Control</h2>
+            <h2 class="text-xl font-bold mb-4 border-b pb-2 text-blue-800">Panel de Control</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
                     <label class="block text-sm font-bold mb-1">Nombre del Premio:</label>
-                    <input type="text" id="nombreRifa" class="w-full p-2 border rounded" placeholder="Ej: Moto 0km">
+                    <input type="text" id="nombreRifa" class="w-full p-2 border rounded focus:border-blue-500" placeholder="Ej: Moto 0km">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-1">Precio (Bs.):</label>
-                    <input type="number" id="precioRifa" class="w-full p-2 border rounded" placeholder="Ej: 10">
+                    <input type="number" id="precioRifa" class="w-full p-2 border rounded focus:border-blue-500" placeholder="Ej: 10">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-bold mb-1">URL de la Imagen:</label>
-                    <input type="text" id="imagenRifa" class="w-full p-2 border rounded" placeholder="Pega el link de la foto aquí">
+                    <input type="text" id="imagenRifa" class="w-full p-2 border rounded focus:border-blue-500" placeholder="Pega el link de la foto aquí">
                 </div>
             </div>
-            <button id="btnGuardar" class="w-full bg-green-600 text-white font-bold py-3 rounded hover:bg-green-700 mb-6">
+            <button id="btnGuardar" class="w-full bg-green-600 text-white font-bold py-3 rounded hover:bg-green-700 shadow-md mb-6">
                 PUBLICAR NUEVA RIFA
             </button>
 
@@ -48,8 +48,8 @@
                 <option value="">Seleccione para modificar o vender...</option>
             </select>
             <input type="text" id="inputVendidos" class="w-full p-2 border rounded mb-2" placeholder="Números vendidos (ej: 5, 12, 40)">
-            <button id="btnActualizarVendidos" class="w-full bg-blue-800 text-white py-2 rounded mb-2">Actualizar Números Vendidos</button>
-            <button id="btnEliminar" class="w-full bg-black text-white py-2 rounded">Eliminar Rifa Permanentemente</button>
+            <button id="btnActualizarVendidos" class="w-full bg-blue-800 text-white py-2 rounded mb-2 hover:bg-blue-900">Actualizar Números Vendidos</button>
+            <button id="btnEliminar" class="w-full bg-black text-white py-2 rounded hover:bg-gray-800">Eliminar Rifa Permanentemente</button>
         </div>
 
         <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -61,7 +61,7 @@
         import { getDatabase, ref, push, onValue, update, remove } 
         from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Configuración basada en tus capturas
+        // CONFIGURACIÓN EXACTA DE TUS FOTOS
         const firebaseConfig = {
             apiKey: "AIzaSyCrDZ6_gzi9cV1u2nf-eJ8BKsDesy8SxbE",
             authDomain: "mis-rifas-52a79.firebaseapp.com",
@@ -77,7 +77,6 @@
         const db = getDatabase(app);
         const rifasRef = ref(db, 'rifas');
 
-        // Referencias HTML
         const adminPanel = document.getElementById('adminPanel');
         const contenedor = document.getElementById('contenedorRifas');
         const selectRifas = document.getElementById('selectRifas');
@@ -89,64 +88,75 @@
             else alert("Clave incorrecta");
         };
 
-        // Guardar Rifa
+        // Guardar Rifa en Firebase
         document.getElementById('btnGuardar').onclick = () => {
             const nuevaRifa = {
                 nombre: document.getElementById('nombreRifa').value,
                 precio: document.getElementById('precioRifa').value,
-                imagen: document.getElementById('imagenRifa').value,
+                imagen: document.getElementById('imagenRifa').value || "https://via.placeholder.com/300",
                 vendidos: ""
             };
             if(nuevaRifa.nombre && nuevaRifa.precio) {
-                push(rifasRef, nuevaRifa);
-                alert("Rifa publicada");
-                adminPanel.classList.add('hidden');
+                push(rifasRef, nuevaRifa)
+                    .then(() => {
+                        alert("Rifa publicada correctamente");
+                        document.getElementById('nombreRifa').value = "";
+                        document.getElementById('precioRifa').value = "";
+                        document.getElementById('imagenRifa').value = "";
+                        adminPanel.classList.add('hidden');
+                    })
+                    .catch((error) => alert("Error al conectar: " + error.message));
+            } else {
+                alert("Completa nombre y precio");
             }
         };
 
-        // Leer Datos en tiempo real
+        // Sincronización en tiempo real
         onValue(rifasRef, (snapshot) => {
             contenedor.innerHTML = "";
             selectRifas.innerHTML = '<option value="">Seleccione para modificar...</option>';
             const data = snapshot.val();
             
-            for (let id in data) {
-                const rifa = data[id];
-                // Crear Card
-                contenedor.innerHTML += `
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden rifa-card border">
-                        <img src="${rifa.imagen}" class="w-full h-48 object-cover">
-                        <div class="p-4 text-center">
-                            <h3 class="text-xl font-bold uppercase">${rifa.nombre}</h3>
-                            <p class="text-red-600 font-bold text-lg">Bs. ${rifa.precio}</p>
-                            <div class="mt-2 text-xs text-gray-500">
-                                <strong>Vendidos:</strong> ${rifa.vendidos || 'Ninguno'}
+            if (data) {
+                for (let id in data) {
+                    const rifa = data[id];
+                    contenedor.innerHTML += `
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden rifa-card border border-gray-200">
+                            <img src="${rifa.imagen}" class="w-full h-48 object-cover">
+                            <div class="p-4 text-center">
+                                <h3 class="text-xl font-bold uppercase text-gray-800">${rifa.nombre}</h3>
+                                <p class="text-red-600 font-bold text-xl mt-1">Bs. ${rifa.precio}</p>
+                                <div class="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                                    <strong>Números vendidos:</strong><br>
+                                    ${rifa.vendidos || '¡Todos disponibles!'}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                // Llenar Select
-                const opt = document.createElement('option');
-                opt.value = id;
-                opt.textContent = rifa.nombre;
-                selectRifas.appendChild(opt);
+                    `;
+                    const opt = document.createElement('option');
+                    opt.value = id;
+                    opt.textContent = rifa.nombre;
+                    selectRifas.appendChild(opt);
+                }
+            } else {
+                contenedor.innerHTML = '<p class="text-center text-gray-500 col-span-2">No hay rifas activas. Abre el panel para crear una.</p>';
             }
         });
 
-        // Actualizar Vendidos
+        // Actualizar Números
         document.getElementById('btnActualizarVendidos').onclick = () => {
             const id = selectRifas.value;
             const nuevosVendidos = document.getElementById('inputVendidos').value;
             if(id) {
-                update(ref(db, `rifas/${id}`), { vendidos: nuevosVendidos });
-                alert("Lista de números actualizada");
+                update(ref(db, `rifas/${id}`), { vendidos: nuevosVendidos })
+                    .then(() => alert("Números actualizados"));
             }
         };
 
-        // Eliminar
+        // Eliminar Rifa
         document.getElementById('btnEliminar').onclick = () => {
             const id = selectRifas.value;
-            if(id && confirm("¿Eliminar esta rifa?")) {
+            if(id && confirm("¿Seguro que quieres borrar esta rifa?")) {
                 remove(ref(db, `rifas/${id}`));
             }
         };
