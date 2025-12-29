@@ -6,17 +6,29 @@
     <title>Sorteos Venezuela</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* La llave invisible está aquí, a la derecha del título */
+        /* Botón con forma de rueda de moto arriba a la derecha */
         #btnAdmin {
             position: absolute;
-            right: 10px;
+            right: 15px;
             top: 15px;
-            width: 50px;
-            height: 40px;
-            background: transparent;
-            border: none;
-            cursor: default;
+            width: 35px;
+            height: 35px;
+            background: #333;
+            border-radius: 50%;
+            border: 4px dashed #555; /* Efecto de rin */
+            cursor: pointer;
             z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        #btnAdmin::after {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -25,52 +37,51 @@
     <header class="bg-white shadow-md p-4 mb-6 relative">
         <div class="max-w-4xl mx-auto">
             <h1 class="text-2xl font-extrabold text-blue-900">🎰 RIFAS VENEZUELA</h1>
-            <button id="btnAdmin"></button>
+            <div id="btnAdmin" title="Admin"></div>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
         
         <div id="adminPanel" class="hidden bg-white p-6 rounded-xl shadow-2xl mb-8 border-t-4 border-blue-600">
-            <h2 class="text-xl font-bold mb-4 text-blue-800">Panel de Control</h2>
+            <h2 class="text-xl font-bold mb-4 text-blue-800 uppercase">Panel de Control</h2>
             <div class="space-y-3">
-                <input type="text" id="nombreRifa" class="w-full p-3 border rounded-lg" placeholder="Nombre del Producto">
+                <input type="text" id="nombreRifa" class="w-full p-3 border rounded-lg" placeholder="Nombre de la Moto / Producto">
                 <input type="number" id="precioRifa" class="w-full p-3 border rounded-lg" placeholder="Precio en Bs.">
                 <input type="text" id="imagenRifa" class="w-full p-3 border rounded-lg" placeholder="URL de la Foto (Link)">
-                <button id="btnGuardar" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg">PUBLICAR PRODUCTO</button>
+                <button id="btnGuardar" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700">PUBLICAR PRODUCTO</button>
                 <div class="mt-4 pt-4 border-t">
                     <select id="selectRifas" class="w-full p-3 border rounded-lg mb-2"></select>
-                    <button id="btnEliminar" class="w-full bg-black text-white py-2 rounded-lg">ELIMINAR PRODUCTO</button>
+                    <button id="btnEliminar" class="w-full bg-black text-white py-2 rounded-lg">ELIMINAR SELECCIONADA</button>
                 </div>
             </div>
         </div>
 
         <div id="formCompra" class="hidden bg-white p-6 rounded-xl shadow-2xl mb-8 border-t-4 border-green-500">
-            <h2 class="text-2xl font-black mb-4 text-green-700 uppercase text-center">Datos de tu Compra</h2>
-            <p id="txtRifaSeleccionada" class="text-center font-bold mb-6 p-2 bg-green-50 rounded"></p>
+            <h2 class="text-2xl font-black mb-4 text-green-700 uppercase text-center">Formulario de Reserva</h2>
+            <p id="txtRifaSeleccionada" class="text-center font-bold mb-6 p-2 bg-green-50 rounded text-gray-700"></p>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <input type="text" id="nombreComprador" class="p-3 border rounded-lg" placeholder="Nombre Completo">
-                <input type="text" id="cedulaComprador" class="p-3 border rounded-lg" placeholder="Cédula">
-                <input type="text" id="telComprador" class="p-3 border rounded-lg" placeholder="Teléfono">
-                <input type="text" id="telRespaldo" class="p-3 border rounded-lg" placeholder="Teléfono de Respaldo">
+                <input type="text" id="cedulaComprador" class="p-3 border rounded-lg" placeholder="Cédula de Identidad">
+                <input type="text" id="telComprador" class="p-3 border rounded-lg" placeholder="Número de Teléfono">
+                <input type="text" id="telRespaldo" class="p-3 border rounded-lg" placeholder="Número de Respaldo">
                 <input type="text" id="direccionComprador" class="p-3 border rounded-lg md:col-span-2" placeholder="Dirección Corta">
-                <input type="text" id="numerosElegidos" class="p-3 border-2 border-green-400 rounded-lg md:col-span-2 font-bold" placeholder="Números que deseas (Ej: 05, 14, 22)">
+                <input type="text" id="numerosElegidos" class="p-3 border-2 border-green-500 rounded-lg md:col-span-2 font-bold" placeholder="¿Qué números quieres? (Ej: 22, 45, 09)">
                 
-                <div class="md:col-span-2">
-                    <label class="block font-bold text-gray-600 text-sm mb-1">Adjuntar Comprobante (Opcional):</label>
+                <div class="md:col-span-2 bg-gray-50 p-3 rounded-lg border">
+                    <label class="block font-bold text-gray-600 text-xs mb-1 uppercase">Adjuntar Foto de Documento/Pago:</label>
                     <input type="file" id="fotoDocumento" class="w-full text-sm" accept="image/*">
                 </div>
                 
-                <button id="btnEnviarWhatsApp" class="md:col-span-2 w-full bg-green-500 text-white font-black py-4 rounded-xl shadow-lg mt-2">
-                    ENVIAR DATOS POR WHATSAPP
+                <button id="btnEnviarWhatsApp" class="md:col-span-2 w-full bg-green-600 text-white font-black py-4 rounded-xl shadow-lg mt-2 text-lg">
+                    ENVIAR PEDIDO POR WHATSAPP
                 </button>
                 <button onclick="document.getElementById('formCompra').classList.add('hidden')" class="md:col-span-2 text-gray-400 font-bold py-2">Cerrar</button>
             </div>
         </div>
 
-        <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            </div>
+        <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
     </main>
 
     <script type="module">
@@ -91,27 +102,28 @@
         const db = getDatabase(app);
         const rifasRef = ref(db, 'rifas');
 
-        // Función para abrir Admin
+        // CLAVE NUEVA: 051011
         document.getElementById('btnAdmin').onclick = () => {
-            let pass = prompt("Clave de acceso:");
-            if(pass === "1234") document.getElementById('adminPanel').classList.toggle('hidden');
+            let pass = prompt("Clave de Administrador:");
+            if(pass === "051011") document.getElementById('adminPanel').classList.toggle('hidden');
+            else alert("Acceso denegado");
         };
 
-        // Guardar en Firebase
+        // Guardar Producto
         document.getElementById('btnGuardar').onclick = () => {
             const nombre = document.getElementById('nombreRifa').value;
             const precio = document.getElementById('precioRifa').value;
             const imagen = document.getElementById('imagenRifa').value;
             if(nombre && precio) {
                 push(rifasRef, { nombre, precio, imagen: imagen || "https://via.placeholder.com/400" });
-                alert("¡Producto publicado!");
+                alert("¡Publicado con éxito!");
                 document.getElementById('nombreRifa').value = "";
                 document.getElementById('precioRifa').value = "";
                 document.getElementById('imagenRifa').value = "";
             }
         };
 
-        // Leer productos y activar botones
+        // Mostrar Productos
         onValue(rifasRef, (snapshot) => {
             const contenedor = document.getElementById('contenedorRifas');
             const select = document.getElementById('selectRifas');
@@ -121,26 +133,24 @@
             for (let id in data) {
                 const r = data[id];
                 const div = document.createElement('div');
-                div.className = "bg-white rounded-2xl shadow-lg overflow-hidden border p-4";
+                div.className = "bg-white rounded-2xl shadow-lg overflow-hidden border p-4 hover:shadow-2xl transition";
                 div.innerHTML = `
                     <img src="${r.imagen}" class="w-full h-48 object-cover rounded-xl mb-4">
-                    <h3 class="text-xl font-bold uppercase text-center">${r.nombre}</h3>
+                    <h3 class="text-xl font-bold uppercase text-center text-gray-800">${r.nombre}</h3>
                     <p class="text-red-600 font-black text-2xl text-center my-2">Bs. ${r.precio}</p>
-                    <button class="btn-comprar w-full bg-blue-700 text-white font-bold py-3 rounded-xl hover:bg-blue-800 transition shadow-md">
+                    <button class="btn-comprar w-full bg-blue-700 text-white font-bold py-3 rounded-xl hover:bg-blue-800 shadow-md">
                         COMPRAR AHORA
                     </button>
                 `;
                 
-                // Evento de clic corregido para cada botón
                 div.querySelector('.btn-comprar').onclick = () => {
                     document.getElementById('formCompra').classList.remove('hidden');
-                    document.getElementById('txtRifaSeleccionada').innerText = `🎁 COMPRANDO: ${r.nombre} (Bs. ${r.precio})`;
+                    document.getElementById('txtRifaSeleccionada').innerText = `🎁 SELECCIONADO: ${r.nombre} | PRECIO: Bs. ${r.precio}`;
                     window.datosCompra = { nombre: r.nombre, precio: r.precio };
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 };
                 
                 contenedor.appendChild(div);
-
                 const opt = document.createElement('option');
                 opt.value = id; opt.textContent = r.nombre;
                 select.appendChild(opt);
@@ -157,16 +167,17 @@
             const nums = document.getElementById('numerosElegidos').value;
 
             if(n && c && nums) {
-                const mensaje = `*PEDIDO DE RIFA*%0A*Producto:* ${window.datosCompra.nombre}%0A*Monto:* Bs. ${window.datosCompra.precio}%0A%0A*CLIENTE:* ${n}%0A*Cédula:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${r}%0A*Dirección:* ${d}%0A*NÚMEROS:* ${nums}`;
+                const mensaje = `*NUEVO PEDIDO DE RIFA*%0A*Producto:* ${window.datosCompra.nombre}%0A*Costo:* Bs. ${window.datosCompra.precio}%0A%0A*CLIENTE:* ${n}%0A*Cédula:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${r}%0A*Dirección:* ${d}%0A*NÚMEROS:* ${nums}%0A%0A_Adjunto envío foto de mis documentos/pago._`;
                 window.open(`https://wa.me/584126324690?text=${mensaje}`, '_blank');
             } else {
-                alert("Completa Nombre, Cédula y Números elegidos");
+                alert("Completa los campos obligatorios: Nombre, Cédula y Números");
             }
         };
 
+        // Eliminar
         document.getElementById('btnEliminar').onclick = () => {
             const id = document.getElementById('selectRifas').value;
-            if(id) remove(ref(db, `rifas/${id}`));
+            if(id && confirm("¿Eliminar este producto?")) remove(ref(db, `rifas/${id}`));
         };
     </script>
 </body>
