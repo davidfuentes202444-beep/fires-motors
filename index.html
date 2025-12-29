@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteos Vzla - Limpieza Total</title>
+    <title>Sorteos Vzla - Velocidad Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -11,10 +11,7 @@
 
     <header class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
         <h1 class="font-black uppercase tracking-tighter text-xl">🚀 Sorteos Vzla</h1>
-        <div class="flex gap-2">
-            <button id="btnLimpiarTodo" class="bg-red-600 text-[10px] px-2 rounded font-bold uppercase">Limpiar Errores</button>
-            <button id="btnAdmin" class="bg-orange-500 w-8 h-8 rounded-full border-2 border-white"><i class="fas fa-lock text-xs"></i></button>
-        </div>
+        <button id="btnAdmin" class="bg-orange-500 w-8 h-8 rounded-full border-2 border-white"><i class="fas fa-lock text-xs"></i></button>
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
@@ -23,20 +20,20 @@
                 <div>
                     <h3 class="font-black text-blue-900 uppercase border-b-2 mb-4">Nueva Rifa</h3>
                     <div class="space-y-3">
-                        <input type="text" id="nombreRifa" class="w-full p-3 bg-slate-100 rounded-xl" placeholder="Nombre">
+                        <input type="text" id="nombreRifa" class="w-full p-3 bg-slate-100 rounded-xl outline-none" placeholder="Nombre">
                         <input type="number" id="precioRifa" class="p-3 bg-slate-100 rounded-xl w-full" placeholder="Precio Bs.">
                         <input type="number" id="cantidadNumeros" class="p-3 bg-slate-100 rounded-xl w-full" placeholder="Cantidad">
                         <input type="file" id="archivoFoto" class="w-full text-xs" accept="image/*">
-                        <button id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl">PUBLICAR</button>
+                        <button id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition">PUBLICAR AL INSTANTE</button>
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="font-black text-orange-600 border-b-2 mb-4">Gestión</h3>
-                    <select id="selectRifasAdmin" class="w-full p-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-bold mb-4">
-                        <option value="">-- Seleccionar para borrar --</option>
+                    <h3 class="font-black text-orange-600 border-b-2 mb-4">Gestión Directa</h3>
+                    <select id="selectRifasAdmin" class="w-full p-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-bold mb-4 outline-none">
+                        <option value="">-- Elige para eliminar --</option>
                     </select>
-                    <button id="btnEliminar" class="w-full bg-red-600 text-white font-black py-3 rounded-xl">ELIMINAR SELECCIONADA</button>
+                    <button id="btnEliminar" class="w-full bg-red-600 text-white font-black py-3 rounded-xl shadow-lg active:scale-95 transition">BORRAR AHORA</button>
                 </div>
             </div>
         </div>
@@ -46,7 +43,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
@@ -63,92 +60,88 @@
         const storage = getStorage(app);
         const rifasRef = ref(db, 'rifas');
 
-        // FUNCIÓN PARA ELIMINAR RIFAS VACÍAS/ERRORES
-        document.getElementById('btnLimpiarTodo').onclick = async () => {
-            if(!confirm("¿Eliminar todas las rifas con errores (Undefined)?")) return;
-            const snapshot = await get(rifasRef);
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                for (let id in data) {
-                    if (!data[id].nombre || data[id].nombre === "UNDEFINED") {
-                        await remove(ref(db, `rifas/${id}`));
-                    }
-                }
-                alert("Limpieza completada");
-            }
-        };
-
         document.getElementById('btnAdmin').onclick = () => { if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
 
-        // GUARDAR CON VALIDACIÓN
+        // PUBLICACIÓN INSTANTÁNEA (UI PRIMERO)
         document.getElementById('btnGuardar').onclick = async () => {
             const n = document.getElementById('nombreRifa').value;
             const p = document.getElementById('precioRifa').value;
             const c = document.getElementById('cantidadNumeros').value;
             const f = document.getElementById('archivoFoto').files[0];
 
-            if(!n || !p || !c || !f) return alert("Llena todos los campos");
+            if(!n || !p || !c || !f) return alert("Faltan datos");
 
             const id = push(rifasRef).key;
-            const imgRef = sRef(storage, `sorteos/${id}`);
+            const localImg = URL.createObjectURL(f); // Crea URL instantánea para visualización
+
+            // 1. Guardar en DB con URL local temporal
+            await update(ref(db, `rifas/${id}`), {
+                nombre: n.toUpperCase(),
+                precio: p,
+                cantidad: parseInt(c),
+                imagen: localImg,
+                vendidos: ""
+            });
+
+            document.getElementById('adminPanel').classList.add('hidden');
             
+            // 2. Subir imagen real en segundo plano
+            const imgRef = sRef(storage, `sorteos/${id}`);
             uploadBytes(imgRef, f).then(async (snap) => {
-                const url = await getDownloadURL(snap.ref);
-                await update(ref(db, `rifas/${id}`), {
-                    nombre: n.toUpperCase(),
-                    precio: p,
-                    cantidad: parseInt(c),
-                    imagen: url,
-                    vendidos: ""
-                });
-                location.reload();
+                const finalUrl = await getDownloadURL(snap.ref);
+                update(ref(db, `rifas/${id}`), { imagen: finalUrl });
             });
         };
 
-        // RENDERIZADO Y ELIMINACIÓN CORREGIDA
+        // RENDERIZADO EN TIEMPO REAL
         onValue(rifasRef, (snap) => {
             const cont = document.getElementById('contenedorRifas');
             const selA = document.getElementById('selectRifasAdmin');
             cont.innerHTML = "";
-            selA.innerHTML = '<option value="">-- Seleccionar para borrar --</option>';
+            selA.innerHTML = '<option value="">-- Elige para eliminar --</option>';
             
             const data = snap.val();
             if(!data) return;
 
             Object.keys(data).forEach(id => {
                 const r = data[id];
-                // Solo mostrar si tiene datos válidos
-                if(r.nombre && r.nombre !== "UNDEFINED") {
+                if(r.nombre) {
                     const opt = document.createElement('option');
                     opt.value = id; opt.textContent = r.nombre;
                     selA.appendChild(opt);
 
-                    cont.innerHTML += `
-                        <div class="bg-white rounded-[2rem] shadow-lg p-4 border text-center">
-                            <img src="${r.imagen}" class="h-48 w-full object-cover rounded-2xl mb-4">
-                            <h3 class="font-black uppercase">${r.nombre}</h3>
-                            <p class="text-blue-600 font-black">Bs. ${r.precio}</p>
-                            <button class="w-full bg-slate-900 text-white py-3 rounded-xl mt-4 font-bold">ELEGIR NÚMEROS</button>
-                        </div>`;
+                    const card = document.createElement('div');
+                    card.id = `card-${id}`;
+                    card.className = "bg-white rounded-[2rem] shadow-lg p-4 border text-center transition-all duration-300";
+                    card.innerHTML = `
+                        <img src="${r.imagen}" class="h-48 w-full object-cover rounded-2xl mb-4">
+                        <h3 class="font-black uppercase">${r.nombre}</h3>
+                        <p class="text-blue-600 font-black">Bs. ${r.precio}</p>
+                        <button class="w-full bg-slate-900 text-white py-3 rounded-xl mt-4 font-bold">ELEGIR NÚMEROS</button>`;
+                    cont.appendChild(card);
                 }
             });
         });
 
+        // ELIMINACIÓN INSTANTÁNEA (OPTIMISTA)
         document.getElementById('btnEliminar').onclick = async () => {
             const id = document.getElementById('selectRifasAdmin').value;
             if(!id) return alert("Selecciona una rifa");
             
-            if(confirm("¿Eliminar definitivamente?")) {
-                try {
-                    // Intenta borrar la foto primero
-                    await deleteObject(sRef(storage, `sorteos/${id}`));
-                } catch (e) { console.log("Foto ya no existe"); }
+            if(confirm("¿Eliminar ahora mismo?")) {
+                // Desaparecer de la UI de inmediato
+                const card = document.getElementById(`card-${id}`);
+                if(card) card.style.display = 'none';
                 
-                // Borra el registro de la base de datos
-                await remove(ref(db, `rifas/${id}`));
-                alert("Eliminado con éxito");
+                // Borrar de la base de datos en segundo plano
+                remove(ref(db, `rifas/${id}`));
+                
+                try {
+                    deleteObject(sRef(storage, `sorteos/${id}`));
+                } catch (e) { console.log("Sin foto"); }
             }
         };
     </script>
 </body>
 </html>
+
