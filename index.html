@@ -3,110 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteos Venezuela - Master Panel</title>
+    <title>Rifas Venezuela - Veloz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .n-btn { width: 42px; height: 42px; font-weight: bold; border-radius: 8px; transition: 0.2s; border: 1px solid #e2e8f0; }
-        .n-sold { background: #ef4444 !important; color: white !important; cursor: not-allowed; border-color: #dc2626; }
-        .n-selected { background: #16a34a !important; color: white !important; transform: scale(1.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .n-btn { width: 40px; height: 40px; font-weight: bold; border-radius: 6px; border: 1px solid #ddd; }
+        .n-sold { background: #ef4444 !important; color: white !important; cursor: not-allowed; }
+        .n-selected { background: #16a34a !important; color: white !important; transform: scale(1.1); }
         .admin-spin { animation: spin 4s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-900">
+<body class="bg-gray-100 min-h-screen">
 
-    <header class="bg-blue-900 text-white p-4 sticky top-0 z-50 shadow-md">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-black italic uppercase tracking-tighter">🎰 Rifas Venezuela</h1>
-            <button id="btnAdmin" class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                <i class="fas fa-cog"></i>
-            </button>
-        </div>
+    <header class="bg-blue-900 text-white p-4 shadow-xl flex justify-between items-center">
+        <h1 class="text-xl font-black italic uppercase">🎰 Rifas Venezuela</h1>
+        <button id="btnAdmin" class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center border-2 border-white admin-spin">
+            <i class="fas fa-cog"></i>
+        </button>
     </header>
 
     <main class="max-w-6xl mx-auto p-4">
         
-        <div id="adminPanel" class="hidden space-y-6 mb-12">
-            <div class="bg-white rounded-3xl p-6 shadow-2xl border-2 border-orange-500">
-                <div class="flex items-center justify-between mb-6 border-b pb-4">
-                    <h2 class="text-2xl font-black text-orange-600 uppercase italic">Panel de Control Pro</h2>
-                    <span class="bg-slate-100 px-3 py-1 rounded-full text-[10px] font-bold text-slate-500 uppercase">Status: Online</span>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
-                        <h3 class="font-black text-sm mb-4 flex items-center"><i class="fas fa-plus-circle mr-2 text-green-600"></i>NUEVO SORTEO</h3>
+        <div id="adminPanel" class="hidden space-y-6 mb-8">
+            <div class="bg-white rounded-3xl p-6 shadow-2xl border-4 border-orange-500">
+                <h2 class="text-xl font-black text-orange-600 mb-6 uppercase border-b pb-2 italic">Control Maestro</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 italic">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h3 class="font-bold text-sm mb-4"><i class="fas fa-bolt text-yellow-500"></i> CREACIÓN INSTANTÁNEA</h3>
                         <div class="space-y-3">
-                            <input type="text" id="nombreRifa" class="w-full p-3 rounded-xl border outline-none focus:ring-2 ring-orange-300" placeholder="Nombre (Ej: Bera SBR)">
+                            <input type="text" id="nombreRifa" class="w-full p-3 rounded-lg border outline-none" placeholder="Nombre (Ej: Bera SBR)">
                             <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="precioRifa" class="p-3 rounded-xl border" placeholder="Precio Bs.">
-                                <input type="number" id="cantidadNumeros" class="p-3 rounded-xl border" placeholder="Cantidad">
+                                <input type="number" id="precioRifa" class="p-3 rounded-lg border" placeholder="Precio Bs.">
+                                <input type="number" id="cantidadNumeros" class="p-3 rounded-lg border" placeholder="Cant. Números">
                             </div>
-                            <div class="p-3 bg-white border border-dashed border-blue-400 rounded-xl text-center">
-                                <input type="file" id="archivoFoto" class="text-xs w-full" accept="image/*">
-                            </div>
-                            <button id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl hover:bg-blue-700 transition">PUBLICAR SORTEO</button>
+                            <input type="file" id="archivoFoto" class="w-full text-xs p-2 bg-white rounded border border-dashed border-blue-400" accept="image/*">
+                            <button id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-xl hover:bg-blue-700 transition">PUBLICAR AL INSTANTE</button>
                         </div>
                     </div>
 
-                    <div class="lg:col-span-2 space-y-4">
-                        <div class="bg-orange-50 p-5 rounded-2xl border border-orange-200">
-                            <h3 class="font-black text-sm mb-4 text-orange-800 flex items-center"><i class="fas fa-tasks mr-2"></i>GESTIÓN DE VENDIDOS</h3>
-                            <div class="flex gap-3 mb-4">
-                                <select id="selectRifasAdmin" class="flex-1 p-3 rounded-xl border-2 border-orange-400 font-bold bg-white outline-none">
-                                    <option value="">-- Elige qué rifa editar --</option>
-                                </select>
-                                <button id="btnEliminar" class="bg-red-100 text-red-600 px-4 rounded-xl hover:bg-red-600 hover:text-white transition"><i class="fas fa-trash"></i></button>
-                            </div>
-
-                            <div id="statsArea" class="hidden grid grid-cols-3 gap-2 mb-4">
-                                <div class="bg-white p-3 rounded-xl text-center shadow-sm">
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase">Vendidos</p>
-                                    <p id="statVendidos" class="text-xl font-black text-green-600">0</p>
-                                </div>
-                                <div class="bg-white p-3 rounded-xl text-center shadow-sm">
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase">Disponibles</p>
-                                    <p id="statLibres" class="text-xl font-black text-blue-600">0</p>
-                                </div>
-                                <div class="bg-white p-3 rounded-xl text-center shadow-sm border-l-4 border-green-500">
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase">Recaudado</p>
-                                    <p id="statDinero" class="text-xl font-black text-slate-800">0</p>
-                                </div>
-                            </div>
-
-                            <div id="areaGestion" class="hidden">
-                                <div id="gridAdminNumeros" class="grid grid-cols-6 sm:grid-cols-10 gap-1 bg-white p-3 rounded-xl max-h-52 overflow-y-auto border shadow-inner"></div>
-                            </div>
-                        </div>
+                    <div class="bg-orange-50 p-4 rounded-2xl border border-orange-200">
+                        <h3 class="font-bold text-sm mb-4"><i class="fas fa-list-check text-orange-600"></i> MARCAR VENDIDOS</h3>
+                        <select id="selectRifasAdmin" class="w-full p-3 rounded-xl border-2 border-orange-400 font-bold mb-4 outline-none">
+                            <option value="">-- Selecciona una rifa --</option>
+                        </select>
+                        <div id="gridAdminNumeros" class="grid grid-cols-6 sm:grid-cols-10 gap-1 bg-white p-2 rounded-lg max-h-48 overflow-y-auto border shadow-inner"></div>
+                        <button id="btnEliminar" class="w-full mt-4 text-xs text-red-500 font-bold uppercase underline">Eliminar este sorteo</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 italic"></div>
     </main>
 
-    <div id="formCompra" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm"></div>
-        <div class="bg-white relative w-full max-w-2xl rounded-[2rem] overflow-hidden shadow-2xl">
-            <div class="bg-green-600 p-5 text-white flex justify-between items-center">
-                <h2 class="text-xl font-black uppercase italic">Selecciona tu suerte</h2>
-                <button onclick="document.getElementById('formCompra').classList.add('hidden')" class="text-2xl">&times;</button>
+    <div id="formCompra" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 italic">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+        <div class="bg-white relative w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl">
+            <div class="bg-green-600 p-4 text-white flex justify-between">
+                <span class="font-black uppercase tracking-widest">Elige tus números</span>
+                <button onclick="document.getElementById('formCompra').classList.add('hidden')"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6">
-                <div id="gridNumeros" class="grid grid-cols-5 sm:grid-cols-8 gap-2 mb-6 max-h-[45vh] overflow-y-auto p-2"></div>
-                <div class="space-y-4">
-                    <div class="bg-yellow-50 p-4 rounded-2xl border-2 border-dashed border-yellow-400 text-center">
-                        <p id="listaFinal" class="text-2xl font-black text-slate-800">---</p>
-                    </div>
-                    <input type="text" id="nombreComprador" class="w-full p-4 rounded-xl border-2 outline-none focus:border-green-500 font-bold" placeholder="Escribe tu Nombre">
-                    <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-5 rounded-2xl text-xl shadow-lg flex items-center justify-center">
-                        <i class="fab fa-whatsapp mr-3 text-2xl"></i> CONFIRMAR RESERVA
-                    </button>
+                <div id="gridNumeros" class="grid grid-cols-5 sm:grid-cols-8 gap-2 mb-6 max-h-[40vh] overflow-y-auto p-2"></div>
+                <div class="p-4 bg-yellow-100 rounded-xl text-center mb-4 border-2 border-dashed border-yellow-400">
+                    <p id="listaFinal" class="text-2xl font-black text-slate-800">---</p>
                 </div>
+                <input type="text" id="nombreComprador" class="w-full p-4 rounded-xl border-2 mb-4 font-bold outline-none" placeholder="Tu Nombre">
+                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-xl text-xl shadow-lg flex items-center justify-center">
+                    <i class="fab fa-whatsapp mr-2 text-2xl"></i> CONFIRMAR PEDIDO
+                </button>
             </div>
         </div>
     </div>
@@ -136,100 +103,91 @@
             if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden');
         };
 
-        // Guardar con manejo de errores
+        // PUBLICACIÓN INSTANTÁNEA
         document.getElementById('btnGuardar').onclick = async () => {
-            const btn = document.getElementById('btnGuardar');
             const n = document.getElementById('nombreRifa').value;
             const p = document.getElementById('precioRifa').value;
             const c = document.getElementById('cantidadNumeros').value;
             const f = document.getElementById('archivoFoto').files[0];
 
-            if(!n || !p || !c || !f) return alert("Completa todos los campos");
+            if(!n || !p || !c) return alert("Completa los datos básicos");
 
-            try {
-                btn.disabled = true;
-                btn.innerText = "SUBIENDO IMAGEN...";
-                const imgPath = `rifas/${Date.now()}_${f.name}`;
-                const storageRef = sRef(storage, imgPath);
-                
-                await uploadBytes(storageRef, f);
-                const url = await getDownloadURL(storageRef);
+            // 1. Crear entrada en DB de inmediato con imagen temporal
+            const nuevaRifaRef = push(rifasRef);
+            const rifaId = nuevaRifaRef.key;
 
-                await push(rifasRef, {
-                    nombre: n, precio: p, cantidad: parseInt(c), imagen: url, vendidos: ""
+            await update(ref(db, `rifas/${rifaId}`), {
+                nombre: n, precio: p, cantidad: parseInt(c), 
+                imagen: "https://via.placeholder.com/500?text=Subiendo+Imagen...", 
+                vendidos: ""
+            });
+
+            document.getElementById('adminPanel').classList.add('hidden');
+            alert("¡Rifa publicada! La imagen se verá en unos segundos.");
+
+            // 2. Subir imagen real en "segundo plano"
+            if(f) {
+                const storageRef = sRef(storage, `sorteos/${rifaId}`);
+                uploadBytes(storageRef, f).then(snapshot => {
+                    getDownloadURL(snapshot.ref).then(url => {
+                        update(ref(db, `rifas/${rifaId}`), { imagen: url });
+                    });
                 });
-
-                alert("Sorteo publicado!");
-                location.reload();
-            } catch (e) {
-                alert("Error al subir. Revisa los permisos de Firebase Storage.");
-                btn.disabled = false;
-                btn.innerText = "PUBLICAR SORTEO";
             }
+            
+            // Limpiar campos
+            document.getElementById('nombreRifa').value = "";
+            document.getElementById('precioRifa').value = "";
+            document.getElementById('cantidadNumeros').value = "";
         };
 
         onValue(rifasRef, (snapshot) => {
             const contenedor = document.getElementById('contenedorRifas');
             const selectAdmin = document.getElementById('selectRifasAdmin');
             contenedor.innerHTML = "";
-            selectAdmin.innerHTML = '<option value="">-- Elige qué rifa editar --</option>';
-            
+            selectAdmin.innerHTML = '<option value="">-- Selecciona una rifa --</option>';
             const data = snapshot.val();
             if(!data) return;
 
             Object.keys(data).reverse().forEach(id => {
                 const r = data[id];
-                
-                // Select Admin
                 const opt = document.createElement('option');
                 opt.value = id; opt.textContent = r.nombre;
                 selectAdmin.appendChild(opt);
 
-                // Tarjeta
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-[2rem] overflow-hidden shadow-lg border border-slate-200 group transition duration-500 hover:shadow-2xl";
+                card.className = "bg-white rounded-3xl overflow-hidden shadow-lg border";
                 card.innerHTML = `
-                    <div class="h-64 relative overflow-hidden">
-                        <img src="${r.imagen}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                        <div class="absolute top-4 left-4 bg-blue-900 text-white px-4 py-1 rounded-full font-black text-xs">Bs. ${r.precio}</div>
-                    </div>
+                    <div class="h-56 bg-gray-200"><img src="${r.imagen}" class="w-full h-full object-cover"></div>
                     <div class="p-6">
-                        <h3 class="text-xl font-black uppercase mb-4">${r.nombre}</h3>
-                        <button class="btn-buy w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition">COMPRAR NÚMEROS</button>
+                        <h3 class="text-xl font-black uppercase text-slate-800">${r.nombre}</h3>
+                        <p class="text-red-600 font-black text-2xl my-2">Bs. ${r.precio}</p>
+                        <button class="btn-buy w-full bg-blue-900 text-white font-bold py-3 rounded-xl">COMPRAR TICKETS</button>
                     </div>
                 `;
-                card.querySelector('.btn-buy').onclick = () => abrirModal(r, id);
+                card.querySelector('.btn-buy').onclick = () => {
+                    document.getElementById('formCompra').classList.remove('hidden');
+                    window.currentOrder = { ...r, id };
+                    renderizarGrid(r);
+                };
                 contenedor.appendChild(card);
             });
         });
 
-        // Lógica de Marcado Admin
+        // Gestión de Marcado Admin
         document.getElementById('selectRifasAdmin').onchange = (e) => {
             const id = e.target.value;
-            if(!id) {
-                document.getElementById('areaGestion').classList.add('hidden');
-                document.getElementById('statsArea').classList.add('hidden');
-                return;
-            }
-
+            if(!id) return;
             onValue(ref(db, `rifas/${id}`), (snap) => {
                 const r = snap.val();
                 if(!r) return;
-                
-                document.getElementById('areaGestion').classList.remove('hidden');
-                document.getElementById('statsArea').classList.remove('hidden');
-                
-                const vendidosArr = r.vendidos ? r.vendidos.split(',') : [];
-                document.getElementById('statVendidos').innerText = vendidosArr.length;
-                document.getElementById('statLibres').innerText = r.cantidad - vendidosArr.length;
-                document.getElementById('statDinero').innerText = (vendidosArr.length * r.precio).toLocaleString();
-
                 const grid = document.getElementById('gridAdminNumeros');
                 grid.innerHTML = "";
+                const vendidosArr = r.vendidos ? r.vendidos.split(',') : [];
                 for(let i=0; i<r.cantidad; i++) {
                     let n = i.toString().padStart(2, '0');
                     let btn = document.createElement('button');
-                    btn.className = `text-[10px] border p-2 rounded ${vendidosArr.includes(n) ? 'bg-red-500 text-white' : 'bg-white'}`;
+                    btn.className = `text-[10px] p-1 border ${vendidosArr.includes(n) ? 'bg-red-500 text-white' : 'bg-white'}`;
                     btn.innerText = n;
                     btn.onclick = () => {
                         let nuevos = vendidosArr.includes(n) ? vendidosArr.filter(x => x !== n) : [...vendidosArr, n];
@@ -240,24 +198,17 @@
             });
         };
 
-        function abrirModal(r, id) {
-            document.getElementById('formCompra').classList.remove('hidden');
-            window.currentOrder = { ...r, id };
-            seleccionados = [];
-            document.getElementById('listaFinal').innerText = "---";
-            
+        function renderizarGrid(r) {
             const grid = document.getElementById('gridNumeros');
-            grid.innerHTML = "";
+            grid.innerHTML = ""; seleccionados = [];
             const vendidos = r.vendidos ? r.vendidos.split(',') : [];
-
             for(let i=0; i<r.cantidad; i++) {
                 let n = i.toString().padStart(2, '0');
                 let btn = document.createElement('button');
-                btn.className = "n-btn bg-slate-50";
+                btn.className = "n-btn bg-white";
                 btn.innerText = n;
                 if(vendidos.includes(n)) {
-                    btn.classList.add('n-sold');
-                    btn.disabled = true;
+                    btn.classList.add('n-sold'); btn.disabled = true;
                 } else {
                     btn.onclick = () => {
                         if(seleccionados.includes(n)) {
@@ -276,14 +227,14 @@
 
         document.getElementById('btnWhatsApp').onclick = () => {
             const n = document.getElementById('nombreComprador').value;
-            if(!n || seleccionados.length === 0) return alert("Pon tu nombre y elige números");
-            const msg = `*RESERVA DE RIFA*%0A*Premio:* ${window.currentOrder.nombre}%0A*Cliente:* ${n}%0A*Números:* ${seleccionados.join(", ")}`;
+            if(!n || seleccionados.length === 0) return alert("Completa los datos");
+            const msg = `*RESERVA RIFA*%0A*Premio:* ${window.currentOrder.nombre}%0A*Cliente:* ${n}%0A*Números:* ${seleccionados.join(", ")}`;
             window.open(`https://wa.me/584126324690?text=${msg}`, '_blank');
         };
 
         document.getElementById('btnEliminar').onclick = () => {
             const id = document.getElementById('selectRifasAdmin').value;
-            if(id && confirm("¿Borrar sorteo?")) remove(ref(db, `rifas/${id}`));
+            if(id && confirm("¿Borrar?")) remove(ref(db, `rifas/${id}`));
         };
     </script>
 </body>
