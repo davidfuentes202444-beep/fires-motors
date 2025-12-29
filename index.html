@@ -3,51 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sorteos Express</title>
+    <title>Sorteos Vzla - Limpieza Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .n-grid::-webkit-scrollbar { width: 4px; }
-        .n-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    </style>
 </head>
 <body class="bg-slate-50 italic">
 
     <header class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg sticky top-0 z-50">
-        <h1 class="font-black uppercase italic tracking-tighter text-xl">🚀 Sorteos Vzla</h1>
-        <button id="btnAdmin" class="bg-orange-500 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white"><i class="fas fa-lock text-xs"></i></button>
+        <h1 class="font-black uppercase tracking-tighter text-xl">🚀 Sorteos Vzla</h1>
+        <div class="flex gap-2">
+            <button id="btnLimpiarTodo" class="bg-red-600 text-[10px] px-2 rounded font-bold uppercase">Limpiar Errores</button>
+            <button id="btnAdmin" class="bg-orange-500 w-8 h-8 rounded-full border-2 border-white"><i class="fas fa-lock text-xs"></i></button>
+        </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
-        <div id="adminPanel" class="hidden bg-white p-6 rounded-[2rem] shadow-2xl border-4 border-orange-500 mb-8 animate-in slide-in-from-top duration-300">
+        <div id="adminPanel" class="hidden bg-white p-6 rounded-[2rem] shadow-2xl border-4 border-orange-500 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h3 class="font-black text-blue-900 uppercase border-b-2 mb-4">Nueva Rifa</h3>
                     <div class="space-y-3">
-                        <input type="text" id="nombreRifa" class="w-full p-3 bg-slate-100 rounded-xl outline-none" placeholder="Nombre del Premio">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="precioRifa" class="p-3 bg-slate-100 rounded-xl" placeholder="Precio Bs.">
-                            <input type="number" id="cantidadNumeros" class="p-3 bg-slate-100 rounded-xl" placeholder="Cantidad">
-                        </div>
-                        <div class="relative border-2 border-dashed border-blue-300 p-4 rounded-xl text-center">
-                            <input type="file" id="archivoFoto" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
-                            <p class="text-xs font-bold text-blue-500"><i class="fas fa-image mr-2"></i>Subir Foto</p>
-                            <p id="fileName" class="text-[10px] text-slate-400 mt-1"></p>
-                        </div>
-                        <div id="uploadProgress" class="hidden w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                            <div id="progressBar" class="bg-blue-600 h-full w-0 transition-all"></div>
-                        </div>
-                        <button id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl hover:bg-blue-700">PUBLICAR AL INSTANTE</button>
+                        <input type="text" id="nombreRifa" class="w-full p-3 bg-slate-100 rounded-xl" placeholder="Nombre">
+                        <input type="number" id="precioRifa" class="p-3 bg-slate-100 rounded-xl w-full" placeholder="Precio Bs.">
+                        <input type="number" id="cantidadNumeros" class="p-3 bg-slate-100 rounded-xl w-full" placeholder="Cantidad">
+                        <input type="file" id="archivoFoto" class="w-full text-xs" accept="image/*">
+                        <button id="btnGuardar" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl">PUBLICAR</button>
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="font-black text-orange-600 border-b-2 mb-4">Gestión & Borrado</h3>
-                    <select id="selectRifasAdmin" class="w-full p-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-bold mb-4 outline-none">
-                        <option value="">-- Seleccionar --</option>
+                    <h3 class="font-black text-orange-600 border-b-2 mb-4">Gestión</h3>
+                    <select id="selectRifasAdmin" class="w-full p-3 bg-orange-50 border-2 border-orange-200 rounded-xl font-bold mb-4">
+                        <option value="">-- Seleccionar para borrar --</option>
                     </select>
-                    <div id="gridAdmin" class="grid grid-cols-10 gap-1 max-h-40 overflow-y-auto n-grid border p-2 bg-white rounded-xl"></div>
-                    <button id="btnEliminar" class="w-full mt-4 bg-red-100 text-red-600 font-black py-2 rounded-xl hover:bg-red-600 hover:text-white transition">ELIMINAR Rifa & FOTO</button>
+                    <button id="btnEliminar" class="w-full bg-red-600 text-white font-black py-3 rounded-xl">ELIMINAR SELECCIONADA</button>
                 </div>
             </div>
         </div>
@@ -55,45 +44,10 @@
         <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
     </main>
 
-    <div id="formCompra" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-2">
-        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm"></div>
-        <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[95vh] animate-in zoom-in duration-200">
-            <div class="bg-green-600 p-4 text-white flex justify-between items-center">
-                <h2 class="font-black uppercase italic">Registro de Pago</h2>
-                <button onclick="document.getElementById('formCompra').classList.add('hidden')" class="text-2xl font-bold">&times;</button>
-            </div>
-            
-            <div class="p-5 overflow-y-auto space-y-4">
-                <div id="gridNumeros" class="grid grid-cols-5 sm:grid-cols-8 gap-1 p-2 bg-slate-50 rounded-2xl border n-grid overflow-y-auto max-h-40"></div>
-
-                <div class="bg-blue-900 text-white p-4 rounded-2xl text-center space-y-1">
-                    <p class="text-[10px] text-blue-300 font-black uppercase">Pago Móvil Banesco (0134)</p>
-                    <p class="font-black">CI: 33.854.892 | 04126324690</p>
-                    <div class="bg-white/10 p-2 rounded-lg mt-2">
-                        <p id="montoTotal" class="text-xl font-black text-green-400">Bs. 0.00</p>
-                        <p id="listaFinal" class="text-[10px] opacity-70">Seleccione números...</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 gap-3 font-bold">
-                    <input type="text" id="nomC" class="w-full p-3 bg-slate-100 rounded-xl" placeholder="Nombre Completo">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="cedC" class="w-full p-3 bg-slate-100 rounded-xl" placeholder="Cédula">
-                        <input type="number" id="tel1C" class="w-full p-3 bg-slate-100 rounded-xl" placeholder="Teléfono">
-                    </div>
-                    <input type="number" id="tel2C" class="w-full p-3 bg-slate-100 rounded-xl" placeholder="Teléfono Secundario">
-                    <input type="text" id="refC" class="w-full p-3 border-2 border-yellow-400 rounded-xl font-black uppercase" placeholder="Últimos 4 dígitos Ref.">
-                </div>
-
-                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg shadow-xl active:scale-95 transition">ENVIAR A WHATSAPP</button>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getDatabase, ref, push, onValue, remove, update, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getStorage, ref as sRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCrDZ6_gzi9cV1u2nf-eJ8BKsDesy8SxbE",
@@ -108,97 +62,92 @@
         const db = getDatabase(app);
         const storage = getStorage(app);
         const rifasRef = ref(db, 'rifas');
-        let seleccionados = [];
 
-        document.getElementById('btnAdmin').onclick = () => { if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
-        document.getElementById('archivoFoto').onchange = (e) => { document.getElementById('fileName').innerText = e.target.files[0].name; };
-
-        document.getElementById('btnGuardar').onclick = async () => {
-            const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
-            if(!n || !p || !c || !f) return alert("Faltan datos o foto");
-
-            const id = push(rifasRef).key;
-            document.getElementById('uploadProgress').classList.remove('hidden');
-            
-            const storageRef = sRef(storage, `sorteos/${id}`);
-            const uploadTask = uploadBytesResumable(storageRef, f);
-
-            uploadTask.on('state_changed', 
-                (snap) => { document.getElementById('progressBar').style.width = (snap.bytesTransferred / snap.totalBytes) * 100 + "%"; },
-                (err) => { alert("Error al subir"); },
-                async () => {
-                    const url = await getDownloadURL(uploadTask.snapshot.ref);
-                    await update(ref(db, `rifas/${id}`), { nombre: n, precio: p, cantidad: parseInt(c), imagen: url, vendidos: "" });
-                    alert("¡Publicado!"); location.reload();
+        // FUNCIÓN PARA ELIMINAR RIFAS VACÍAS/ERRORES
+        document.getElementById('btnLimpiarTodo').onclick = async () => {
+            if(!confirm("¿Eliminar todas las rifas con errores (Undefined)?")) return;
+            const snapshot = await get(rifasRef);
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                for (let id in data) {
+                    if (!data[id].nombre || data[id].nombre === "UNDEFINED") {
+                        await remove(ref(db, `rifas/${id}`));
+                    }
                 }
-            );
+                alert("Limpieza completada");
+            }
         };
 
+        document.getElementById('btnAdmin').onclick = () => { if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
+
+        // GUARDAR CON VALIDACIÓN
+        document.getElementById('btnGuardar').onclick = async () => {
+            const n = document.getElementById('nombreRifa').value;
+            const p = document.getElementById('precioRifa').value;
+            const c = document.getElementById('cantidadNumeros').value;
+            const f = document.getElementById('archivoFoto').files[0];
+
+            if(!n || !p || !c || !f) return alert("Llena todos los campos");
+
+            const id = push(rifasRef).key;
+            const imgRef = sRef(storage, `sorteos/${id}`);
+            
+            uploadBytes(imgRef, f).then(async (snap) => {
+                const url = await getDownloadURL(snap.ref);
+                await update(ref(db, `rifas/${id}`), {
+                    nombre: n.toUpperCase(),
+                    precio: p,
+                    cantidad: parseInt(c),
+                    imagen: url,
+                    vendidos: ""
+                });
+                location.reload();
+            });
+        };
+
+        // RENDERIZADO Y ELIMINACIÓN CORREGIDA
         onValue(rifasRef, (snap) => {
-            const cont = document.getElementById('contenedorRifas'), selA = document.getElementById('selectRifasAdmin');
-            cont.innerHTML = ""; selA.innerHTML = '<option value="">-- Seleccionar --</option>';
-            const data = snap.val(); if(!data) return;
-            Object.keys(data).reverse().forEach(id => {
+            const cont = document.getElementById('contenedorRifas');
+            const selA = document.getElementById('selectRifasAdmin');
+            cont.innerHTML = "";
+            selA.innerHTML = '<option value="">-- Seleccionar para borrar --</option>';
+            
+            const data = snap.val();
+            if(!data) return;
+
+            Object.keys(data).forEach(id => {
                 const r = data[id];
-                const opt = document.createElement('option'); opt.value = id; opt.textContent = r.nombre; selA.appendChild(opt);
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-[2rem] overflow-hidden shadow-lg p-2 border";
-                card.innerHTML = `<img src="${r.imagen}" class="h-48 w-full object-cover rounded-[1.5rem]"><div class="p-4 text-center"><h3 class="font-black uppercase text-slate-800">${r.nombre}</h3><p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-4 rounded-2xl mt-4 font-black text-sm">ELEGIR NÚMEROS</button></div>`;
-                card.querySelector('button').onclick = () => { window.currentR = { ...r, id }; document.getElementById('formCompra').classList.remove('hidden'); renderGrid(r); };
-                cont.appendChild(card);
+                // Solo mostrar si tiene datos válidos
+                if(r.nombre && r.nombre !== "UNDEFINED") {
+                    const opt = document.createElement('option');
+                    opt.value = id; opt.textContent = r.nombre;
+                    selA.appendChild(opt);
+
+                    cont.innerHTML += `
+                        <div class="bg-white rounded-[2rem] shadow-lg p-4 border text-center">
+                            <img src="${r.imagen}" class="h-48 w-full object-cover rounded-2xl mb-4">
+                            <h3 class="font-black uppercase">${r.nombre}</h3>
+                            <p class="text-blue-600 font-black">Bs. ${r.precio}</p>
+                            <button class="w-full bg-slate-900 text-white py-3 rounded-xl mt-4 font-bold">ELEGIR NÚMEROS</button>
+                        </div>`;
+                }
             });
         });
 
-        function renderGrid(r) {
-            const grid = document.getElementById('gridNumeros'); grid.innerHTML = ""; seleccionados = [];
-            const vArr = r.vendidos ? r.vendidos.split(',') : [];
-            for(let i=0; i<r.cantidad; i++) {
-                let n = i.toString().padStart(2, '0'), btn = document.createElement('button');
-                btn.className = `w-10 h-10 text-xs font-bold rounded-lg border ${vArr.includes(n) ? 'bg-red-500 text-white opacity-50' : 'bg-slate-100 text-slate-700'}`;
-                btn.innerText = n;
-                if(vArr.includes(n)) btn.disabled = true;
-                else btn.onclick = () => {
-                    if(seleccionados.includes(n)) { seleccionados = seleccionados.filter(x => x!==n); btn.className = 'w-10 h-10 text-xs font-bold rounded-lg border bg-slate-100'; }
-                    else { seleccionados.push(n); btn.className = 'w-10 h-10 text-xs font-bold rounded-lg border bg-green-500 text-white shadow-lg scale-110'; }
-                    document.getElementById('listaFinal').innerText = "Tickets: " + (seleccionados.join(", ") || "---");
-                    document.getElementById('montoTotal').innerText = "Bs. " + (seleccionados.length * r.precio).toFixed(2);
-                };
-                grid.appendChild(btn);
-            }
-        }
-
-        document.getElementById('btnWhatsApp').onclick = () => {
-            const nom = document.getElementById('nomC').value, ced = document.getElementById('cedC').value, t1 = document.getElementById('tel1C').value, refP = document.getElementById('refC').value;
-            if(!nom || !ced || !t1 || !refP || seleccionados.length === 0) return alert("Faltan datos");
-            const m = `*NUEVA COMPRA*%0A*Premio:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${nom}%0A*Cedula:* ${ced}%0A*Telf:* ${t1}%0A*Ref:* ${refP}`;
-            window.open(`https://wa.me/584126324690?text=${m}`, '_blank');
-        };
-
         document.getElementById('btnEliminar').onclick = async () => {
             const id = document.getElementById('selectRifasAdmin').value;
-            if(!id || !confirm("¿Borrar definitivamente rifa y foto?")) return;
-            try {
-                await deleteObject(sRef(storage, `sorteos/${id}`));
+            if(!id) return alert("Selecciona una rifa");
+            
+            if(confirm("¿Eliminar definitivamente?")) {
+                try {
+                    // Intenta borrar la foto primero
+                    await deleteObject(sRef(storage, `sorteos/${id}`));
+                } catch (e) { console.log("Foto ya no existe"); }
+                
+                // Borra el registro de la base de datos
                 await remove(ref(db, `rifas/${id}`));
-                alert("Eliminado correctamente"); location.reload();
-            } catch (e) { await remove(ref(db, `rifas/${id}`)); location.reload(); }
-        };
-
-        document.getElementById('selectRifasAdmin').onchange = (e) => {
-            const id = e.target.value; if(!id) return;
-            onValue(ref(db, `rifas/${id}`), (s) => {
-                const r = s.val(), grid = document.getElementById('gridAdmin'); grid.innerHTML = "";
-                const vArr = r.vendidos ? r.vendidos.split(',') : [];
-                for(let i=0; i<r.cantidad; i++) {
-                    let n = i.toString().padStart(2, '0'), b = document.createElement('button');
-                    b.className = `p-1 text-[8px] border ${vArr.includes(n) ? 'bg-red-500 text-white' : 'bg-white'}`;
-                    b.innerText = n; b.onclick = () => {
-                        let nV = vArr.includes(n) ? vArr.filter(x => x!==n) : [...vArr, n];
-                        update(ref(db, `rifas/${id}`), { vendidos: nV.join(',') });
-                    };
-                    grid.appendChild(b);
-                }
-            });
+                alert("Eliminado con éxito");
+            }
         };
     </script>
 </body>
