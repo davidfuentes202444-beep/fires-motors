@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David&Corporation</title>
+    <title>Diego&Corporation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -39,36 +39,47 @@
 
     <div id="formCompra" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-2">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="cerrarModal()"></div>
-        <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[90vh] shadow-2xl">
+        <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl">
             <div class="bg-blue-900 p-4 text-white flex justify-between items-center">
-                <h2 class="font-black uppercase italic">Selecciona tus Números</h2>
+                <h2 class="font-black uppercase italic">Datos de Compra</h2>
                 <button onclick="cerrarModal()" class="text-2xl">&times;</button>
             </div>
             
             <div class="p-5 overflow-y-auto space-y-4">
                 <div class="grid grid-cols-1 gap-2">
-                    <div class="flex gap-2">
-                        <input type="number" id="inputNumeroManual" class="flex-1 p-3 border-2 border-blue-200 rounded-xl font-bold text-center" placeholder="Escribe el número aquí">
-                        <button id="btnAgregarManual" class="bg-blue-600 text-white px-4 rounded-xl font-bold">AGREGAR</button>
+                    <div class="relative">
+                        <input type="number" id="inputNumeroManual" class="w-full p-4 border-2 border-blue-200 rounded-xl font-black text-center text-xl outline-none focus:border-blue-500" placeholder="Escribe un número">
+                        <div id="statusBusqueda" class="text-center text-[10px] font-black uppercase mt-1"></div>
                     </div>
-                    <button id="btnSuerte" class="w-full bg-purple-600 text-white font-black py-3 rounded-xl shadow-md"><i class="fas fa-dice mr-2"></i> SELECCIÓN ALEATORIA</button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="btnAgregarManual" class="bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-xs shadow-md">Agregar Selección</button>
+                        <button id="btnSuerte" class="bg-purple-600 text-white py-3 rounded-xl font-black shadow-md text-xs uppercase"><i class="fas fa-dice mr-1"></i> Al Azar</button>
+                    </div>
                 </div>
 
-                <div class="bg-slate-100 p-3 rounded-xl border min-h-[50px]">
-                    <p class="text-[10px] font-black uppercase text-slate-400 mb-1">Tus números:</p>
-                    <div id="listaSeleccionados" class="flex flex-wrap gap-2 text-blue-700 font-bold"></div>
+                <div class="bg-slate-100 p-3 rounded-xl border">
+                    <p class="text-[9px] font-black uppercase text-slate-400 mb-1">Mis Números Seleccionados:</p>
+                    <div id="listaSeleccionados" class="flex flex-wrap gap-2 text-blue-700 font-bold min-h-[20px]"></div>
                 </div>
 
-                <div class="bg-blue-900 text-white p-3 rounded-2xl text-center">
-                    <p id="montoTotal" class="text-2xl font-black text-green-400">Total: Bs. 0.00</p>
+                <div class="bg-blue-900 text-white p-4 rounded-2xl text-center shadow-inner border-t-4 border-green-500">
+                    <p class="text-[9px] font-black text-blue-300 uppercase tracking-widest">PAGO MÓVIL BANESCO (0134)</p>
+                    <p class="font-black text-lg leading-tight">TELÉFONO: 0412-6324690 | C.I: 33.854.892</p>
+                    <p id="montoTotal" class="text-2xl font-black text-green-400 mt-1">Total: Bs. 0.00</p>
                 </div>
 
-                <div class="space-y-2">
-                    <input type="text" id="nomC" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Nombre">
-                    <input type="text" id="refC" class="w-full p-3 border-4 border-yellow-400 rounded-xl font-black text-center" placeholder="Últimos 4 de Referencia">
+                <div class="grid grid-cols-1 gap-2">
+                    <input type="text" id="nomC" class="p-2 border rounded-xl font-bold" placeholder="Nombre y Apellido (Requerido)">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="cedC" class="p-2 border rounded-xl font-bold" placeholder="Cédula (Requerida)">
+                        <input type="number" id="telC" class="p-2 border rounded-xl font-bold" placeholder="WhatsApp (Requerido)">
+                    </div>
+                    <input type="number" id="tel2C" class="p-2 border rounded-xl font-bold" placeholder="Teléfono de Respaldo (Requerido)">
+                    <input type="text" id="dirC" class="p-2 border rounded-xl font-bold" placeholder="Dirección Corta (Requerida)">
+                    <input type="text" id="refC" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-xl" placeholder="Referencia (4 últimos)">
                 </div>
 
-                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl">Confirmar en WhatsApp</button>
+                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl hover:bg-green-700 active:scale-95 transition-all">Confirmar en WhatsApp</button>
             </div>
         </div>
     </div>
@@ -96,37 +107,29 @@
         window.cerrarModal = () => { document.getElementById('formCompra').classList.add('hidden'); seleccionados = []; actualizarUI(); };
         document.getElementById('btnAdmin').onclick = () => { if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
 
-        // PUBLICACIÓN INSTANTÁNEA
         document.getElementById('btnGuardar').onclick = async () => {
             const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
-            if(!n || !f) return alert("Faltan datos");
-            
+            if(!n || !f) return alert("Faltan datos de la rifa");
             const id = push(rifasRef).key;
             const tempUrl = URL.createObjectURL(f);
-
-            // Crear registro local inmediato
             update(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: tempUrl, vendidos: "" });
             document.getElementById('adminPanel').classList.add('hidden');
-
-            // Subir imagen real en segundo plano
             uploadBytes(sRef(storage, `sorteos/${id}`), f).then(async (snap) => {
                 const url = await getDownloadURL(snap.ref);
                 update(ref(db, `rifas/${id}`), { imagen: url });
             });
         };
 
-        // RENDER TARJETAS
         onValue(rifasRef, (snap) => {
             const cont = document.getElementById('contenedorRifas'), selA = document.getElementById('selectRifasAdmin');
             cont.innerHTML = ""; selA.innerHTML = '<option value="">-- Gestionar --</option>';
             const data = snap.val(); if(!data) return;
-
             Object.keys(data).reverse().forEach(id => {
                 const r = data[id];
                 if(r.nombre){
                     selA.innerHTML += `<option value="${id}">${r.nombre}</option>`;
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-[2rem] shadow-xl p-4 text-center border";
+                    card.className = "bg-white rounded-[2rem] shadow-xl p-4 text-center border transition-transform hover:scale-105";
                     card.innerHTML = `<img src="${r.imagen}" class="h-48 w-full object-cover rounded-2xl mb-4"><h3 class="font-black uppercase">${r.nombre}</h3><p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-3 rounded-xl mt-4 font-black">COMPRAR</button>`;
                     card.querySelector('button').onclick = () => { window.currentR = { ...r, id }; document.getElementById('formCompra').classList.remove('hidden'); };
                     cont.appendChild(card);
@@ -134,49 +137,61 @@
             });
         });
 
-        // LÓGICA DE SELECCIÓN POR ESCRITURA
+        document.getElementById('inputNumeroManual').oninput = (e) => {
+            const val = e.target.value;
+            const status = document.getElementById('statusBusqueda');
+            if(!val) { status.innerText = ""; return; }
+            const num = val.padStart(window.currentR.cantidad.toString().length, '0');
+            const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
+            if(parseInt(num) >= window.currentR.cantidad) { status.innerText = "❌ FUERA DE RANGO"; status.className = "text-center text-[10px] font-black mt-1 text-red-500"; }
+            else if(vArr.includes(num)) { status.innerText = "🚫 YA VENDIDO"; status.className = "text-center text-[10px] font-black mt-1 text-red-500"; }
+            else { status.innerText = "✅ DISPONIBLE"; status.className = "text-center text-[10px] font-black mt-1 text-green-500"; }
+        };
+
         document.getElementById('btnAgregarManual').onclick = () => {
             const input = document.getElementById('inputNumeroManual');
             const num = input.value.padStart(window.currentR.cantidad.toString().length, '0');
             const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-
-            if(parseInt(num) >= window.currentR.cantidad) return alert("Número fuera de rango");
-            if(vArr.includes(num)) return alert("Número ya vendido");
-            if(seleccionados.includes(num)) return alert("Ya lo seleccionaste");
-
+            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return alert("Número no disponible o inválido");
             seleccionados.push(num);
-            input.value = "";
+            input.value = ""; document.getElementById('statusBusqueda').innerText = "";
             actualizarUI();
         };
 
-        // LÓGICA AZAR
         document.getElementById('btnSuerte').onclick = () => {
             const r = window.currentR;
             const vArr = r.vendidos ? r.vendidos.split(',') : [];
             let azar = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0');
-            
-            if(!vArr.includes(azar) && !seleccionados.includes(azar)) {
-                seleccionados.push(azar);
-                actualizarUI();
-            } else { document.getElementById('btnSuerte').click(); } // Reintenta si está ocupado
+            if(!vArr.includes(azar) && !seleccionados.includes(azar)) { seleccionados.push(azar); actualizarUI(); }
+            else { document.getElementById('btnSuerte').click(); }
         };
 
         function actualizarUI() {
             const lista = document.getElementById('listaSeleccionados');
-            lista.innerHTML = seleccionados.map(n => `<span class="bg-blue-100 px-2 py-1 rounded-lg">#${n}</span>`).join('');
+            lista.innerHTML = seleccionados.map(n => `<span class="bg-blue-100 px-2 py-1 rounded-lg text-xs">#${n}</span>`).join('');
             document.getElementById('montoTotal').innerText = `Total: Bs. ${(seleccionados.length * window.currentR.precio).toFixed(2)}`;
         }
 
         document.getElementById('btnWhatsApp').onclick = () => {
-            const nom = document.getElementById('nomC').value, refP = document.getElementById('refC').value;
-            if(!nom || !refP || !seleccionados.length) return alert("Faltan datos");
-            const t = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Ref:* ${refP}`;
-            window.open(`https://wa.me/584126324690?text=${t}`, '_blank');
+            const n = document.getElementById('nomC').value;
+            const c = document.getElementById('cedC').value;
+            const t = document.getElementById('telC').value;
+            const t2 = document.getElementById('tel2C').value;
+            const d = document.getElementById('dirC').value;
+            const r = document.getElementById('refC').value;
+
+            // VALIDACIÓN DE TODOS LOS CAMPOS OBLIGATORIOS
+            if(!n || !c || !t || !t2 || !d || !r || !seleccionados.length) {
+                return alert("DEBES RELLENAR TODOS LOS CAMPOS: Nombre, Cédula, WhatsApp, Respaldo, Dirección y Referencia.");
+            }
+
+            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${t2}%0A*Dir:* ${d}%0A*Ref:* ${r}`;
+            window.open(`https://wa.me/584126324690?text=${msj}`, '_blank');
         };
 
         document.getElementById('btnEliminar').onclick = () => {
             const id = document.getElementById('selectRifasAdmin').value;
-            if(id && confirm("¿Eliminar?")) remove(ref(db, `rifas/${id}`));
+            if(id && confirm("¿Borrar sorteo definitivamente?")) remove(ref(db, `rifas/${id}`));
         };
     </script>
 </body>
