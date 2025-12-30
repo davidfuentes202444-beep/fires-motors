@@ -57,20 +57,30 @@
                 <button onclick="cerrarModal()" class="text-2xl">&times;</button>
             </div>
             <div class="p-5 overflow-y-auto space-y-4">
-                <div class="text-center">
-                    <button id="btnSuerte" class="w-full bg-purple-600 text-white py-6 rounded-2xl font-black uppercase text-xl shadow-lg active:scale-95 transition-transform">🎁 ¡DAME UN NÚMERO AL AZAR!</button>
+                <div class="grid grid-cols-1 gap-2">
+                    <input type="number" id="inputNumeroManual" class="w-full p-4 border-2 border-blue-200 rounded-xl font-black text-center text-xl outline-none" placeholder="Escribe el número">
+                    <div id="statusBusqueda" class="text-center text-[10px] font-black uppercase"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="btnAgregarManual" class="bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-xs">Agregar</button>
+                        <button id="btnSuerte" class="bg-purple-600 text-white py-3 rounded-xl font-black uppercase text-xs">Al Azar</button>
+                    </div>
                 </div>
                 <div class="bg-slate-100 p-3 rounded-xl border min-h-[50px] text-center">
                     <div id="listaSeleccionados" class="flex flex-wrap justify-center gap-2 text-blue-700 font-black text-lg"></div>
                 </div>
                 <div class="bg-blue-900 text-white p-4 rounded-2xl text-center border-t-4 border-green-500">
-                    <p class="text-[10px] font-black text-blue-300 uppercase leading-none mb-1">PAGO MÓVIL BANESCO (0134)</p>
+                    <p class="text-[10px] font-black text-blue-300 uppercase mb-1 leading-none">PAGO MÓVIL BANESCO (0134)</p>
                     <p class="font-black text-lg">0412-6324690 | C.I: 33.854.892</p>
                     <p id="montoTotal" class="text-2xl font-black text-green-400 mt-1">Total: Bs. 0.00</p>
                 </div>
                 <div class="grid grid-cols-1 gap-2">
                     <input type="text" id="nomC" class="p-2 border rounded-xl font-bold" placeholder="Nombre completo *">
-                    <div class="grid grid-cols-2 gap-2"><input type="number" id="cedC" class="p-2 border rounded-xl font-bold" placeholder="Cédula *"><input type="number" id="telC" class="p-2 border rounded-xl font-bold" placeholder="WhatsApp *"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" id="cedC" class="p-2 border rounded-xl font-bold" placeholder="Cédula *">
+                        <input type="number" id="telC" class="p-2 border rounded-xl font-bold" placeholder="WhatsApp *">
+                    </div>
+                    <input type="number" id="tel2C" class="p-2 border rounded-xl font-bold" placeholder="Teléfono Respaldo *">
+                    <input type="text" id="dirC" class="p-2 border rounded-xl font-bold" placeholder="Dirección Corta *">
                     <input type="text" id="refC" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-xl" placeholder="Referencia (4 últimos) *">
                 </div>
                 <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl hover:bg-green-700">Finalizar Compra</button>
@@ -80,7 +90,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, update, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCrDZ6_gzi9cV1u2nf-eJ8BKsDesy8SxbE", authDomain: "mis-rifas-52a79.firebaseapp.com", databaseURL: "https://mis-rifas-52a79-default-rtdb.firebaseio.com", projectId: "mis-rifas-52a79", storageBucket: "mis-rifas-52a79.appspot.com", appId: "1:636792561568:web:feb960e943e7f92777cec5" };
@@ -97,7 +107,6 @@
             const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
             if(!n || !f) return alert("Faltan datos");
             const id = push(rifasRef).key;
-            // Publicación instantánea con base64 para rapidez total
             const reader = new FileReader();
             reader.readAsDataURL(f);
             reader.onload = async () => {
@@ -119,7 +128,7 @@
                 selA.innerHTML += `<option value="${id}">${r.nombre}</option>`;
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-[2rem] shadow-xl p-4 text-center border overflow-hidden";
-                card.innerHTML = `<img src="${r.imagen}" class="h-56 w-full object-cover rounded-2xl mb-4"><h3 class="font-black uppercase text-sm">${r.nombre}</h3><p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-4 rounded-xl mt-4 font-black uppercase text-xs">¡PARTICIPAR YA!</button>`;
+                card.innerHTML = `<img src="${r.imagen}" loading="lazy" class="h-56 w-full object-cover rounded-2xl mb-4 bg-slate-200"><h3 class="font-black uppercase text-sm">${r.nombre}</h3><p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-4 rounded-xl mt-4 font-black uppercase text-xs">¡PARTICIPAR!</button>`;
                 card.querySelector('button').onclick = () => { window.currentR = { ...r, id }; document.getElementById('formCompra').classList.remove('hidden'); };
                 cont.appendChild(card);
             });
@@ -147,9 +156,12 @@
                     let n = i.toString().padStart(r.cantidad.toString().length, '0'), btn = document.createElement('div'), name = comps[n] || "";
                     btn.className = `num-admin p-1 text-[9px] font-bold border rounded text-center ${vArr.includes(n) ? 'bg-red-500 text-white' : 'bg-green-100 text-green-700'}`;
                     btn.setAttribute('data-comp', name); btn.innerHTML = `${n} <span class="tooltip">${name || 'Libre'}</span>`;
-                    btn.onclick = () => {
+                    btn.onclick = async () => {
                         let nom = document.getElementById('adminNombreVenta').value || "Vendido";
-                        let currentV = r.vendidos ? r.vendidos.split(',').filter(x => x !== "") : [], newComps = {...comps};
+                        let snap = await get(ref(db, `rifas/${id}`));
+                        let rActual = snap.val();
+                        let currentV = rActual.vendidos ? rActual.vendidos.split(',').filter(x => x !== "") : [];
+                        let newComps = rActual.compradores || {};
                         if(currentV.includes(n)) { currentV = currentV.filter(x => x !== n); delete newComps[n]; }
                         else { currentV.push(n); newComps[n] = nom; }
                         update(ref(db, `rifas/${id}`), { vendidos: currentV.join(','), compradores: newComps });
@@ -159,12 +171,28 @@
             });
         };
 
+        document.getElementById('inputNumeroManual').oninput = (e) => {
+            const val = e.target.value, status = document.getElementById('statusBusqueda');
+            if(!val) { status.innerText = ""; return; }
+            const num = val.padStart(window.currentR.cantidad.toString().length, '0');
+            const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
+            if(parseInt(num) >= window.currentR.cantidad) { status.innerText = "❌ INVÁLIDO"; status.className = "text-center text-red-500 font-bold text-[10px]"; }
+            else if(vArr.includes(num)) { status.innerText = "🚫 VENDIDO"; status.className = "text-center text-red-500 font-bold text-[10px]"; }
+            else { status.innerText = "✅ DISPONIBLE"; status.className = "text-center text-green-600 font-bold text-[10px]"; }
+        };
+
+        document.getElementById('btnAgregarManual').onclick = () => {
+            const input = document.getElementById('inputNumeroManual'), num = input.value.padStart(window.currentR.cantidad.toString().length, '0');
+            const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
+            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return alert("No disponible");
+            seleccionados.push(num); input.value = ""; document.getElementById('statusBusqueda').innerText = ""; actualizarUI();
+        };
+
         document.getElementById('btnSuerte').onclick = () => {
             const r = window.currentR, vArr = r.vendidos ? r.vendidos.split(',') : [];
             let azar = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0');
             if(!vArr.includes(azar) && !seleccionados.includes(azar)) { seleccionados.push(azar); actualizarUI(); }
             else if (vArr.length + seleccionados.length < r.cantidad) { document.getElementById('btnSuerte').click(); }
-            else { alert("¡AGOTADO!"); }
         };
 
         function actualizarUI() {
@@ -173,9 +201,9 @@
         }
 
         document.getElementById('btnWhatsApp').onclick = () => {
-            const n = document.getElementById('nomC').value, c = document.getElementById('cedC').value, t = document.getElementById('telC').value, r = document.getElementById('refC').value;
-            if(!n || !c || !t || !r || !seleccionados.length) return alert("COMPLETA TODO");
-            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*Telf:* ${t}%0A*Ref:* ${r}`;
+            const n = document.getElementById('nomC').value, c = document.getElementById('cedC').value, t = document.getElementById('telC').value, t2 = document.getElementById('tel2C').value, d = document.getElementById('dirC').value, r = document.getElementById('refC').value;
+            if(!n || !c || !t || !t2 || !d || !r || !seleccionados.length) return alert("COMPLETA TODOS LOS CAMPOS (*)");
+            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${t2}%0A*Dir:* ${d}%0A*Ref:* ${r}`;
             window.open(`https://wa.me/584126324690?text=${msj}`, '_blank');
         };
 
