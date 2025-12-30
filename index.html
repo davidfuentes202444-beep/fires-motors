@@ -3,87 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diego&Corporation</title>
+    <title>Diego&Corporation | Pro Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); gap: 4px; max-height: 400px; overflow-y: auto; padding: 10px; background: #f8fafc; border-radius: 1.5rem; }
-        .num-admin { transition: all 0.1s; position: relative; cursor: pointer; }
+        .grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; max-height: 450px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 1rem; border: 2px solid #e2e8f0; }
+        .num-admin { transition: all 0.1s; position: relative; cursor: pointer; border: 1px solid #cbd5e1; }
         .num-admin:hover .tooltip { display: block; }
-        .tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; white-space: nowrap; z-index: 50; }
-        .highlight-search { border: 3px solid #f59e0b !important; transform: scale(1.1); background-color: #fef3c7 !important; }
+        .tooltip { display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; white-space: nowrap; z-index: 50; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .highlight-search { border: 3px solid #f59e0b !important; transform: scale(1.05); background-color: #fef3c7 !important; color: #92400e !important; z-index: 10; }
+        .is-vendido { background-color: #ef4444 !important; color: white !important; border-color: #b91c1c !important; }
     </style>
 </head>
-<body class="bg-slate-100 italic text-slate-800">
+<body class="bg-slate-50 italic text-slate-800">
 
-    <header class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-xl sticky top-0 z-50">
-        <h1 class="font-black uppercase tracking-tighter text-xl italic">💎 Diego&Corporation</h1>
-        <button id="btnAdmin" class="bg-orange-500 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center"><i class="fas fa-lock text-xs"></i></button>
+    <header class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-2xl sticky top-0 z-50 border-b-4 border-orange-500">
+        <h1 class="font-black uppercase tracking-tighter text-2xl italic">💎 Diego&Corporation</h1>
+        <button id="btnAdmin" class="bg-orange-500 hover:bg-orange-600 w-10 h-10 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all active:scale-90"><i class="fas fa-cog"></i></button>
     </header>
 
-    <main class="max-w-6xl mx-auto p-4">
-        <div id="adminPanel" class="hidden bg-white p-6 rounded-[2rem] shadow-2xl border-4 border-orange-500 mb-10">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-3">
-                    <h3 class="font-black text-blue-900 uppercase text-xs italic">Publicación Flash</h3>
-                    <input type="text" id="nombreRifa" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Premio">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="precioRifa" class="p-2 bg-slate-50 border rounded-xl" placeholder="Precio Bs.">
-                        <input type="number" id="cantidadNumeros" class="p-2 bg-slate-50 border rounded-xl" placeholder="Cantidad">
-                    </div>
-                    <input type="file" id="archivoFoto" class="w-full text-xs" accept="image/*">
-                    <button id="btnGuardar" class="w-full bg-green-600 text-white font-black py-3 rounded-xl shadow-lg uppercase">Publicar Ahora</button>
+    <main class="max-w-7xl mx-auto p-4">
+        <div id="adminPanel" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
+            <div class="bg-white rounded-[2.5rem] shadow-2xl border-4 border-blue-900 overflow-hidden mb-10">
+                <div class="bg-blue-900 p-4 text-white flex justify-between items-center">
+                    <h2 class="font-black uppercase italic flex items-center gap-2"><i class="fas fa-terminal"></i> Consola de Administración</h2>
+                    <div id="statsAdmin" class="text-[10px] font-bold bg-blue-800 px-3 py-1 rounded-full border border-blue-700">Cargando...</div>
                 </div>
-                <div class="space-y-4">
-                    <h3 class="font-black text-red-600 uppercase text-xs italic">Gestión de Clientes</h3>
-                    <select id="selectRifasAdmin" class="w-full p-2 border-2 border-slate-200 rounded-xl font-bold"></select>
-                    <div class="flex gap-2">
-                        <input type="text" id="adminNombreVenta" class="flex-1 p-2 bg-yellow-50 border-2 border-yellow-200 rounded-xl text-xs font-bold" placeholder="Nombre para marcar o BUSCAR">
-                        <div id="countSearch" class="bg-yellow-500 text-white px-3 flex items-center rounded-xl font-black text-xs">0</div>
+                
+                <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-4 space-y-3 bg-slate-50 p-4 rounded-3xl border border-slate-200">
+                        <h3 class="font-black text-blue-900 uppercase text-xs">Nueva Rifa Flash</h3>
+                        <input type="text" id="nombreRifa" class="w-full p-3 bg-white border-2 border-slate-200 rounded-2xl focus:border-blue-500 outline-none text-sm" placeholder="Nombre del Premio">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="precioRifa" class="p-3 bg-white border-2 border-slate-200 rounded-2xl text-sm" placeholder="Bs.">
+                            <input type="number" id="cantidadNumeros" class="p-3 bg-white border-2 border-slate-200 rounded-2xl text-sm" placeholder="Total N°">
+                        </div>
+                        <input type="file" id="archivoFoto" class="w-full text-[10px] file:bg-blue-900 file:text-white file:border-none file:px-4 file:py-2 file:rounded-full cursor-pointer" accept="image/*">
+                        <button id="btnGuardar" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-2xl shadow-lg uppercase transition-all">Lanzar Rifa</button>
                     </div>
-                    <div id="adminGridNumeros" class="grid-admin border border-slate-300"></div>
-                    <button id="btnEliminar" class="w-full bg-red-600 text-white font-black py-2 rounded-xl text-[10px] uppercase">Borrar Rifa</button>
+
+                    <div class="lg:col-span-8 space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <select id="selectRifasAdmin" class="w-full p-3 border-2 border-blue-100 rounded-2xl font-bold bg-white text-sm"></select>
+                            <div class="relative">
+                                <input type="text" id="adminNombreVenta" class="w-full p-3 bg-yellow-50 border-2 border-yellow-400 rounded-2xl text-sm font-black uppercase placeholder:italic" placeholder="BUSCAR CLIENTE O ASIGNAR A...">
+                                <span id="countSearch" class="absolute right-3 top-3 bg-orange-500 text-white text-[10px] px-2 py-1 rounded-md font-black">0</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2 bg-blue-50 p-3 rounded-2xl border border-blue-100">
+                            <input type="text" id="inputEnlaceMasivo" class="flex-1 p-2 rounded-xl text-xs border border-blue-200" placeholder="Pegar números separados por coma (ej: 05, 12, 44)">
+                            <button id="btnEnlaceMasivo" class="bg-blue-900 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-black transition-all">Enlazar</button>
+                        </div>
+
+                        <div id="adminGridNumeros" class="grid-admin"></div>
+                        
+                        <div class="flex justify-between items-center gap-4">
+                            <button id="btnEliminar" class="bg-red-100 text-red-600 hover:bg-red-600 hover:text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase transition-all">Borrar Sorteo</button>
+                            <p class="text-[10px] text-slate-400 font-bold">* Toca un número para asignarlo/liberarlo individualmente</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
 
     <div id="formCompra" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-2">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="cerrarModal()"></div>
-        <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl">
-            <div class="bg-blue-900 p-4 text-white flex justify-between items-center">
-                <h2 class="font-black uppercase italic">Sistema de Tickets</h2>
-                <button onclick="cerrarModal()" class="text-2xl">&times;</button>
+        <div class="bg-white relative w-full max-w-lg rounded-[3rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl border-4 border-blue-900">
+            <div class="bg-blue-900 p-5 text-white flex justify-between items-center">
+                <h2 class="font-black uppercase italic tracking-tighter">🛒 Reservar Tickets</h2>
+                <button onclick="cerrarModal()" class="bg-white/10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">&times;</button>
             </div>
-            <div class="p-5 overflow-y-auto space-y-4">
-                <div class="grid grid-cols-1 gap-2">
-                    <input type="number" id="inputNumeroManual" class="w-full p-4 border-2 border-blue-200 rounded-xl font-black text-center text-xl outline-none" placeholder="Escribe el número">
+            
+            <div class="p-6 overflow-y-auto space-y-5">
+                <div class="grid grid-cols-1 gap-3">
+                    <input type="number" id="inputNumeroManual" class="w-full p-5 border-4 border-slate-100 rounded-3xl font-black text-center text-3xl outline-none focus:border-blue-500 transition-all" placeholder="00">
                     <div id="statusBusqueda" class="text-center text-[10px] font-black uppercase"></div>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="btnAgregarManual" class="bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-xs">Agregar</button>
-                        <button id="btnSuerte" class="bg-purple-600 text-white py-3 rounded-xl font-black uppercase text-xs">Al Azar</button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btnAgregarManual" class="bg-blue-900 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md active:scale-95 transition-all">Confirmar N°</button>
+                        <button id="btnSuerte" class="bg-purple-600 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md active:scale-95 transition-all"><i class="fas fa-dice"></i> Al Azar</button>
                     </div>
                 </div>
-                <div class="bg-slate-100 p-3 rounded-xl border min-h-[50px] text-center">
-                    <div id="listaSeleccionados" class="flex flex-wrap justify-center gap-2 text-blue-700 font-black text-lg"></div>
+
+                <div id="listaSeleccionados" class="flex flex-wrap justify-center gap-2 p-2 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 min-h-[60px]"></div>
+
+                <div class="bg-blue-900 text-white p-5 rounded-[2rem] text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 italic font-black text-4xl leading-none">PAGO</div>
+                    <p class="text-[10px] font-black text-blue-300 uppercase mb-1">Pago Móvil Banesco (0134)</p>
+                    <p class="font-black text-xl">0412-6324690 • 33.854.892</p>
+                    <div id="montoTotal" class="text-3xl font-black text-green-400 mt-2">Bs. 0.00</div>
                 </div>
-                <div class="bg-blue-900 text-white p-4 rounded-2xl text-center border-t-4 border-green-500">
-                    <p class="text-[10px] font-black text-blue-300 uppercase mb-1 leading-none">PAGO MÓVIL BANESCO (0134)</p>
-                    <p class="font-black text-lg">0412-6324690 | C.I: 33.854.892</p>
-                    <p id="montoTotal" class="text-2xl font-black text-green-400 mt-1">Total: Bs. 0.00</p>
-                </div>
-                <div class="grid grid-cols-1 gap-2">
-                    <input type="text" id="nomC" class="p-2 border rounded-xl font-bold" placeholder="Nombre completo *">
+
+                <div class="space-y-2">
+                    <input type="text" id="nomC" class="w-full p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Nombre completo">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="cedC" class="p-2 border rounded-xl font-bold" placeholder="Cédula *">
-                        <input type="number" id="telC" class="p-2 border rounded-xl font-bold" placeholder="WhatsApp *">
+                        <input type="number" id="cedC" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Cédula">
+                        <input type="number" id="telC" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="WhatsApp">
                     </div>
-                    <input type="number" id="tel2C" class="p-2 border rounded-xl font-bold" placeholder="Teléfono Respaldo *">
-                    <input type="text" id="dirC" class="p-2 border rounded-xl font-bold" placeholder="Dirección Corta *">
-                    <input type="text" id="refC" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-xl" placeholder="Referencia (4 últimos) *">
+                    <input type="number" id="tel2C" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Teléfono Alternativo">
+                    <input type="text" id="dirC" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Dirección">
+                    <input type="text" id="refC" class="w-full p-4 border-4 border-yellow-400 rounded-2xl font-black text-center text-2xl placeholder:text-slate-300" placeholder="REF. PAGO (4 DÍGITOS)">
                 </div>
-                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl hover:bg-green-700">Finalizar Compra</button>
+
+                <button id="btnWhatsApp" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-[2rem] text-xl uppercase shadow-xl transition-all flex items-center justify-center gap-3"><i class="fab fa-whatsapp"></i> Enviar a Diego</button>
             </div>
         </div>
     </div>
@@ -101,11 +126,12 @@
         let seleccionados = [];
 
         window.cerrarModal = () => { document.getElementById('formCompra').classList.add('hidden'); seleccionados = []; actualizarUI(); };
-        document.getElementById('btnAdmin').onclick = () => { if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
+        document.getElementById('btnAdmin').onclick = () => { if(prompt("Acceso Admin:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
 
+        // PUBLICACIÓN INSTANTÁNEA
         document.getElementById('btnGuardar').onclick = async () => {
             const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
-            if(!n || !f) return alert("Faltan datos");
+            if(!n || !f || !c) return alert("Faltan campos");
             const id = push(rifasRef).key;
             const reader = new FileReader();
             reader.readAsDataURL(f);
@@ -121,19 +147,20 @@
 
         onValue(rifasRef, (snap) => {
             const cont = document.getElementById('contenedorRifas'), selA = document.getElementById('selectRifasAdmin');
-            cont.innerHTML = ""; selA.innerHTML = '<option value="">-- Gestionar Rifa --</option>';
+            cont.innerHTML = ""; selA.innerHTML = '<option value="">-- SELECCIONAR RIFA PARA GESTIONAR --</option>';
             const data = snap.val(); if(!data) return;
             Object.keys(data).reverse().forEach(id => {
                 const r = data[id];
                 selA.innerHTML += `<option value="${id}">${r.nombre}</option>`;
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-[2rem] shadow-xl p-4 text-center border overflow-hidden";
-                card.innerHTML = `<img src="${r.imagen}" loading="lazy" class="h-56 w-full object-cover rounded-2xl mb-4 bg-slate-200"><h3 class="font-black uppercase text-sm">${r.nombre}</h3><p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-4 rounded-xl mt-4 font-black uppercase text-xs">¡PARTICIPAR!</button>`;
+                card.className = "bg-white rounded-[2.5rem] shadow-xl p-5 text-center border-2 border-slate-100 hover:border-blue-200 transition-all";
+                card.innerHTML = `<img src="${r.imagen}" class="h-64 w-full object-cover rounded-[2rem] mb-4 shadow-inner"><h3 class="font-black uppercase text-lg leading-tight mb-1">${r.nombre}</h3><p class="text-blue-600 font-black text-2xl">Bs. ${r.precio}</p><button class="w-full bg-blue-900 text-white py-4 rounded-2xl mt-4 font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-lg active:scale-95">¡Participar!</button>`;
                 card.querySelector('button').onclick = () => { window.currentR = { ...r, id }; document.getElementById('formCompra').classList.remove('hidden'); };
                 cont.appendChild(card);
             });
         });
 
+        // BUSCADOR EN TIEMPO REAL
         document.getElementById('adminNombreVenta').oninput = (e) => {
             const search = e.target.value.toLowerCase(), boxes = document.querySelectorAll('.num-admin');
             let count = 0;
@@ -145,71 +172,101 @@
             document.getElementById('countSearch').innerText = count;
         };
 
+        // GESTIÓN DINÁMICA DE GRILLA
         document.getElementById('selectRifasAdmin').onchange = (e) => {
-            const id = e.target.value, grid = document.getElementById('adminGridNumeros');
-            if(!id) { grid.innerHTML = ""; return; }
+            const id = e.target.value, grid = document.getElementById('adminGridNumeros'), stats = document.getElementById('statsAdmin');
+            if(!id) { grid.innerHTML = ""; stats.innerText = "Esperando selección..."; return; }
             onValue(ref(db, `rifas/${id}`), (snapshot) => {
                 const r = snapshot.val(); if(!r) return;
                 grid.innerHTML = "";
                 let vArr = r.vendidos ? r.vendidos.split(',') : [], comps = r.compradores || {};
+                stats.innerText = `TOTAL: ${r.cantidad} | VENDIDOS: ${vArr.length} | DISP: ${r.cantidad - vArr.length}`;
+                
                 for(let i=0; i < r.cantidad; i++) {
                     let n = i.toString().padStart(r.cantidad.toString().length, '0'), btn = document.createElement('div'), name = comps[n] || "";
-                    btn.className = `num-admin p-1 text-[9px] font-bold border rounded text-center ${vArr.includes(n) ? 'bg-red-500 text-white' : 'bg-green-100 text-green-700'}`;
-                    btn.setAttribute('data-comp', name); btn.innerHTML = `${n} <span class="tooltip">${name || 'Libre'}</span>`;
+                    btn.className = `num-admin p-2 text-[10px] font-black border rounded-lg text-center ${vArr.includes(n) ? 'is-vendido' : 'bg-white text-slate-400'}`;
+                    btn.setAttribute('data-comp', name); btn.innerHTML = `${n} <span class="tooltip">${name || 'LIBRE'}</span>`;
                     btn.onclick = async () => {
-                        let nom = document.getElementById('adminNombreVenta').value || "Vendido";
+                        let nom = document.getElementById('adminNombreVenta').value || "VENDIDO";
                         let snap = await get(ref(db, `rifas/${id}`));
-                        let rActual = snap.val();
-                        let currentV = rActual.vendidos ? rActual.vendidos.split(',').filter(x => x !== "") : [];
-                        let newComps = rActual.compradores || {};
-                        if(currentV.includes(n)) { currentV = currentV.filter(x => x !== n); delete newComps[n]; }
-                        else { currentV.push(n); newComps[n] = nom; }
-                        update(ref(db, `rifas/${id}`), { vendidos: currentV.join(','), compradores: newComps });
+                        let curV = snap.val().vendidos ? snap.val().vendidos.split(',').filter(x=>x!="") : [], newC = snap.val().compradores || {};
+                        if(curV.includes(n)) { curV = curV.filter(x => x !== n); delete newC[n]; }
+                        else { curV.push(n); newC[n] = nom; }
+                        update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
                     };
                     grid.appendChild(btn);
                 }
             });
         };
 
+        // ENLACE MASIVO (Asociar lista de números a un nombre)
+        document.getElementById('btnEnlaceMasivo').onclick = async () => {
+            const id = document.getElementById('selectRifasAdmin').value;
+            const lista = document.getElementById('inputEnlaceMasivo').value;
+            const nombre = document.getElementById('adminNombreVenta').value || "CLIENTE";
+            if(!id || !lista) return alert("Selecciona rifa y pega números");
+            
+            let numsAEnlazar = lista.split(',').map(n => n.trim());
+            let snap = await get(ref(db, `rifas/${id}`));
+            let data = snap.val();
+            let curV = data.vendidos ? data.vendidos.split(',').filter(x=>x!="") : [];
+            let newC = data.compradores || {};
+
+            numsAEnlazar.forEach(n => {
+                let padN = n.padStart(data.cantidad.toString().length, '0');
+                if(!curV.includes(padN)) curV.push(padN);
+                newC[padN] = nombre;
+            });
+
+            await update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
+            document.getElementById('inputEnlaceMasivo').value = "";
+            alert("Números enlazados con éxito");
+        };
+
+        // LÓGICA DE COMPRA USUARIO
         document.getElementById('inputNumeroManual').oninput = (e) => {
             const val = e.target.value, status = document.getElementById('statusBusqueda');
             if(!val) { status.innerText = ""; return; }
             const num = val.padStart(window.currentR.cantidad.toString().length, '0');
             const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-            if(parseInt(num) >= window.currentR.cantidad) { status.innerText = "❌ INVÁLIDO"; status.className = "text-center text-red-500 font-bold text-[10px]"; }
-            else if(vArr.includes(num)) { status.innerText = "🚫 VENDIDO"; status.className = "text-center text-red-500 font-bold text-[10px]"; }
-            else { status.innerText = "✅ DISPONIBLE"; status.className = "text-center text-green-600 font-bold text-[10px]"; }
+            if(parseInt(num) >= window.currentR.cantidad) { status.innerHTML = "<span class='text-red-500'>❌ NO EXISTE</span>"; }
+            else if(vArr.includes(num)) { status.innerHTML = "<span class='text-red-500'>🚫 AGOTADO</span>"; }
+            else { status.innerHTML = "<span class='text-green-600 font-black'>✅ DISPONIBLE</span>"; }
         };
 
         document.getElementById('btnAgregarManual').onclick = () => {
             const input = document.getElementById('inputNumeroManual'), num = input.value.padStart(window.currentR.cantidad.toString().length, '0');
             const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return alert("No disponible");
+            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return;
             seleccionados.push(num); input.value = ""; document.getElementById('statusBusqueda').innerText = ""; actualizarUI();
         };
 
         document.getElementById('btnSuerte').onclick = () => {
             const r = window.currentR, vArr = r.vendidos ? r.vendidos.split(',') : [];
-            let azar = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0');
-            if(!vArr.includes(azar) && !seleccionados.includes(azar)) { seleccionados.push(azar); actualizarUI(); }
-            else if (vArr.length + seleccionados.length < r.cantidad) { document.getElementById('btnSuerte').click(); }
+            if (vArr.length + seleccionados.length >= r.cantidad) return alert("SORTEO AGOTADO");
+            let azar;
+            do { azar = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0'); } 
+            while (vArr.includes(azar) || seleccionados.includes(azar));
+            seleccionados.push(azar); actualizarUI();
         };
 
         function actualizarUI() {
-            document.getElementById('listaSeleccionados').innerHTML = seleccionados.map(n => `<span class="bg-blue-100 px-3 py-1 rounded-lg">#${n}</span>`).join('');
-            document.getElementById('montoTotal').innerText = `Total: Bs. ${(seleccionados.length * window.currentR.precio).toFixed(2)}`;
+            document.getElementById('listaSeleccionados').innerHTML = seleccionados.map(n => `<span class="bg-blue-900 text-white px-4 py-2 rounded-xl font-black text-lg animate-bounce">#${n}</span>`).join('');
+            document.getElementById('montoTotal').innerText = `Bs. ${(seleccionados.length * window.currentR.precio).toFixed(2)}`;
         }
 
         document.getElementById('btnWhatsApp').onclick = () => {
-            const n = document.getElementById('nomC').value, c = document.getElementById('cedC').value, t = document.getElementById('telC').value, t2 = document.getElementById('tel2C').value, d = document.getElementById('dirC').value, r = document.getElementById('refC').value;
-            if(!n || !c || !t || !t2 || !d || !r || !seleccionados.length) return alert("COMPLETA TODOS LOS CAMPOS (*)");
-            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${t2}%0A*Dir:* ${d}%0A*Ref:* ${r}`;
+            const inputs = ['nomC', 'cedC', 'telC', 'tel2C', 'dirC', 'refC'];
+            for(let i of inputs) if(!document.getElementById(i).value) return alert("Por favor, llena todos los campos");
+            if(!seleccionados.length) return alert("Selecciona al menos un ticket");
+            
+            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${document.getElementById('nomC').value}%0A*C.I:* ${document.getElementById('cedC').value}%0A*WhatsApp:* ${document.getElementById('telC').value}%0A*Ref. Pago:* ${document.getElementById('refC').value}`;
             window.open(`https://wa.me/584126324690?text=${msj}`, '_blank');
         };
 
         document.getElementById('btnEliminar').onclick = () => {
             const id = document.getElementById('selectRifasAdmin').value;
-            if(id && confirm("¿Borrar?")) remove(ref(db, `rifas/${id}`));
+            if(id && confirm("¿BORRAR ESTA RIFA POR COMPLETO?")) remove(ref(db, `rifas/${id}`));
         };
     </script>
 </body>
