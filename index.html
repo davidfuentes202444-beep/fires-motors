@@ -22,19 +22,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-3 border-b md:border-b-0 md:border-r pb-6 md:pb-0 md:pr-6">
                     <h3 class="font-black text-blue-900 uppercase text-sm">Nueva Rifa</h3>
-                    <input type="text" id="nombreRifa" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Nombre">
+                    <input type="text" id="nombreRifa" class="w-full p-2 bg-slate-50 border rounded-xl outline-none" placeholder="Nombre">
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="precioRifa" class="p-2 bg-slate-50 border rounded-xl" placeholder="Precio Bs.">
                         <input type="number" id="cantidadNumeros" class="p-2 bg-slate-50 border rounded-xl" placeholder="Cantidad">
                     </div>
                     <input type="file" id="archivoFoto" class="w-full text-xs" accept="image/*">
-                    <button id="btnGuardar" class="w-full bg-green-600 text-white font-black py-3 rounded-xl shadow-lg">PUBLICAR</button>
+                    <button id="btnGuardar" class="w-full bg-green-600 text-white font-black py-3 rounded-xl shadow-lg active:scale-95 transition-all">PUBLICAR AL INSTANTE</button>
                 </div>
                 <div class="space-y-4">
-                    <h3 class="font-black text-red-600 uppercase text-sm">Gestionar / Marcar Pagados</h3>
+                    <h3 class="font-black text-red-600 uppercase text-sm">Marcar Pagados / Gestión</h3>
                     <select id="selectRifasAdmin" class="w-full p-2 border-2 border-slate-200 rounded-xl font-bold outline-none"></select>
-                    <div id="gridAdminPagos" class="grid grid-cols-5 sm:grid-cols-10 gap-1 p-2 bg-slate-100 rounded-xl max-h-40 overflow-y-auto"></div>
-                    <button id="btnEliminar" class="w-full bg-red-600 text-white font-black py-2 rounded-xl text-xs">ELIMINAR SORTEO</button>
+                    <div id="gridAdminPagos" class="grid grid-cols-5 sm:grid-cols-10 gap-1 p-2 bg-slate-100 rounded-xl max-h-40 overflow-y-auto border"></div>
+                    <button id="btnEliminar" class="w-full bg-red-600 text-white font-black py-2 rounded-xl text-xs active:scale-95">ELIMINAR ESTE SORTEO</button>
                 </div>
             </div>
         </div>
@@ -51,24 +51,22 @@
             </div>
             
             <div class="p-5 overflow-y-auto space-y-4">
-                <button id="btnSuerte" class="w-full bg-purple-600 text-white font-black py-3 rounded-xl shadow-md hover:bg-purple-700 transition">
-                    <i class="fas fa-dice mr-2"></i> NÚMERO AL AZAR
-                </button>
+                <button id="btnSuerte" class="w-full bg-purple-600 text-white font-black py-3 rounded-xl shadow-md"><i class="fas fa-dice mr-2"></i> NÚMERO AL AZAR</button>
 
                 <div id="gridNumeros" class="grid grid-cols-5 sm:grid-cols-8 gap-1 p-2 bg-slate-100 rounded-2xl border max-h-40 overflow-y-auto"></div>
 
                 <div class="bg-blue-900 text-white p-3 rounded-2xl text-center">
-                    <p class="text-[9px] uppercase">Banesco | 0134 | CI: 33.854.892 | 04126324690</p>
-                    <p id="montoTotal" class="text-xl font-black text-green-400">Bs. 0.00</p>
+                    <p class="text-[9px] uppercase font-bold tracking-widest">Banesco | 0134 | CI: 33.854.892 | 04126324690</p>
+                    <p id="montoTotal" class="text-2xl font-black text-green-400">Bs. 0.00</p>
                 </div>
 
                 <div class="space-y-2">
-                    <input type="text" id="nomC" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Nombre">
+                    <input type="text" id="nomC" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Nombre Completo">
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="cedC" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Cédula">
                         <input type="number" id="tel1C" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="WhatsApp">
                     </div>
-                    <input type="text" id="refC" class="w-full p-3 border-4 border-yellow-400 rounded-xl font-black text-center" placeholder="Referencia (4 últimos)">
+                    <input type="text" id="refC" class="w-full p-3 border-4 border-yellow-400 rounded-xl font-black text-center" placeholder="Últimos 4 de Referencia">
                 </div>
 
                 <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl active:scale-95 transition-all">Enviar a WhatsApp</button>
@@ -99,27 +97,35 @@
         window.cerrarModal = () => { document.getElementById('formCompra').classList.add('hidden'); seleccionados = []; };
         document.getElementById('btnAdmin').onclick = () => { if(prompt("Clave:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
 
-        // GUARDAR RIFA
+        // PUBLICAR RIFA (Arreglado para que se cree al instante)
         document.getElementById('btnGuardar').onclick = async () => {
             const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
-            if(!n || !f) return alert("Faltan datos");
+            if(!n || !p || !c || !f) return alert("Faltan datos");
+            
+            const btn = document.getElementById('btnGuardar');
+            btn.innerText = "Publicando..."; btn.disabled = true;
+
             const id = push(rifasRef).key;
-            const url = await uploadBytes(sRef(storage, `sorteos/${id}`), f).then(s => getDownloadURL(s.ref));
-            await update(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: url, vendidos: "" });
-            document.getElementById('adminPanel').classList.add('hidden');
+            try {
+                const url = await uploadBytes(sRef(storage, `sorteos/${id}`), f).then(s => getDownloadURL(s.ref));
+                await update(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: url, vendidos: "" });
+                document.getElementById('adminPanel').classList.add('hidden');
+                document.getElementById('nombreRifa').value = ""; document.getElementById('archivoFoto').value = "";
+            } catch (e) { alert("Error al subir"); }
+            btn.innerText = "PUBLICAR AL INSTANTE"; btn.disabled = false;
         };
 
-        // RENDER PRINCIPAL
+        // RENDER DE TARJETAS
         onValue(rifasRef, (snap) => {
             const cont = document.getElementById('contenedorRifas'), selA = document.getElementById('selectRifasAdmin');
-            cont.innerHTML = ""; selA.innerHTML = '<option value="">-- Elige Rifa --</option>';
+            cont.innerHTML = ""; selA.innerHTML = '<option value="">-- Elige Rifa para gestionar --</option>';
             const data = snap.val(); if(!data) return;
 
             Object.keys(data).reverse().forEach(id => {
                 const r = data[id];
                 if(r.nombre && r.nombre !== "UNDEFINED"){
                     selA.innerHTML += `<option value="${id}">${r.nombre}</option>`;
-                    const vArr = r.vendidos ? r.vendidos.split(',') : [];
+                    const vArr = r.vendidos ? r.vendidos.split(',').filter(x => x !== "") : [];
                     const agotado = vArr.length >= r.cantidad;
 
                     const card = document.createElement('div');
@@ -128,8 +134,9 @@
                         <img src="${r.imagen}" class="h-48 w-full object-cover rounded-2xl mb-4 ${agotado ? 'grayscale' : ''}">
                         <h3 class="font-black uppercase italic">${r.nombre}</h3>
                         <p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p>
-                        <button class="w-full ${agotado ? 'bg-gray-400' : 'bg-slate-900'} text-white py-3 rounded-xl mt-4 font-black uppercase">${agotado ? 'Agotado' : 'Comprar'}</button>`;
-                    card.querySelector('button').onclick = () => {
+                        <button class="btn-buy w-full ${agotado ? 'bg-gray-400' : 'bg-slate-900'} text-white py-3 rounded-xl mt-4 font-black uppercase">${agotado ? 'Agotado' : 'Comprar'}</button>`;
+                    
+                    card.querySelector('.btn-buy').onclick = () => {
                         window.currentR = { ...r, id };
                         document.getElementById('formCompra').classList.remove('hidden');
                         renderGrid(r);
@@ -139,24 +146,29 @@
             });
         });
 
-        // GRID DE COMPRA
+        // GRID DE COMPRA (USUARIO)
         function renderGrid(r) {
             const grid = document.getElementById('gridNumeros'); grid.innerHTML = "";
-            const vArr = r.vendidos ? r.vendidos.split(',') : [];
+            const vArr = r.vendidos ? r.vendidos.split(',').filter(x => x !== "") : [];
             for(let i=0; i<r.cantidad; i++){
                 let n = i.toString().padStart(2, '0'), btn = document.createElement('button');
                 btn.className = `p-2 text-[10px] font-bold border rounded ${vArr.includes(n) ? 'bg-red-500 text-white' : 'bg-white'}`;
                 btn.innerText = n; btn.disabled = vArr.includes(n);
                 btn.onclick = () => {
-                    if(seleccionados.includes(n)) { seleccionados = seleccionados.filter(x => x!==n); btn.classList.replace('bg-green-500', 'bg-white'); btn.classList.remove('text-white'); }
-                    else { seleccionados.push(n); btn.classList.replace('bg-white', 'bg-green-500'); btn.classList.add('text-white'); }
+                    if(seleccionados.includes(n)) {
+                        seleccionados = seleccionados.filter(x => x!==n);
+                        btn.classList.replace('bg-green-500', 'bg-white'); btn.classList.remove('text-white');
+                    } else {
+                        seleccionados.push(n);
+                        btn.classList.replace('bg-white', 'bg-green-500'); btn.classList.add('text-white');
+                    }
                     document.getElementById('montoTotal').innerText = `Bs. ${(seleccionados.length * r.precio).toFixed(2)}`;
                 };
                 grid.appendChild(btn);
             }
         }
 
-        // PANEL DE PAGOS (ADMIN)
+        // PANEL DE MARCAR PAGADOS (ADMIN)
         document.getElementById('selectRifasAdmin').onchange = async (e) => {
             const id = e.target.value; if(!id) return;
             const r = (await get(ref(db, `rifas/${id}`))).val();
@@ -177,13 +189,17 @@
             }
         };
 
+        // BOTÓN AL AZAR
         document.getElementById('btnSuerte').onclick = () => {
-            const r = window.currentR, vArr = r.vendidos ? r.vendidos.split(',') : [];
-            let libres = [];
-            for(let i=0; i<r.cantidad; i++) { let n = i.toString().padStart(2, '0'); if(!vArr.includes(n) && !seleccionados.includes(n)) libres.push(n); }
-            if(libres.length) {
-                const azar = libres[Math.floor(Math.random() * libres.length)];
-                seleccionados.push(azar);
+            const r = window.currentR, vArr = r.vendidos ? r.vendidos.split(',').filter(x => x !== "") : [];
+            let disponibles = [];
+            for(let i=0; i<r.cantidad; i++){
+                let n = i.toString().padStart(2, '0');
+                if(!vArr.includes(n) && !seleccionados.includes(n)) disponibles.push(n);
+            }
+            if(disponibles.length){
+                const num = disponibles[Math.floor(Math.random()*disponibles.length)];
+                seleccionados.push(num);
                 renderGrid(r);
                 document.getElementById('montoTotal').innerText = `Bs. ${(seleccionados.length * r.precio).toFixed(2)}`;
             }
@@ -198,15 +214,15 @@
 
         document.getElementById('btnEliminar').onclick = async () => {
             const id = document.getElementById('selectRifasAdmin').value;
-            if(id && confirm("¿Eliminar?")) remove(ref(db, `rifas/${id}`));
+            if(id && confirm("¿Borrar definitivamente?")) remove(ref(db, `rifas/${id}`));
         };
-        
+
         document.getElementById('btnLimpiar').onclick = async () => {
             const snap = await get(rifasRef);
             if(snap.exists()){
                 const d = snap.val();
                 for(let id in d) if(!d[id].nombre || d[id].nombre === "UNDEFINED") remove(ref(db, `rifas/${id}`));
-                alert("Limpieza OK");
+                alert("Limpieza completada.");
             }
         };
     </script>
