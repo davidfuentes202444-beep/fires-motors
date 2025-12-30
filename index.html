@@ -3,112 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diego&Corporation | Pro Admin</title>
+    <title>Master Panel | Diego&Corporation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 4px; max-height: 450px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 1rem; border: 2px solid #e2e8f0; }
-        .num-admin { transition: all 0.1s; position: relative; cursor: pointer; border: 1px solid #cbd5e1; }
-        .num-admin:hover .tooltip { display: block; }
-        .tooltip { display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 4px 8px; border-radius: 6px; font-size: 10px; white-space: nowrap; z-index: 50; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-        .highlight-search { border: 3px solid #f59e0b !important; transform: scale(1.05); background-color: #fef3c7 !important; color: #92400e !important; z-index: 10; }
-        .is-vendido { background-color: #ef4444 !important; color: white !important; border-color: #b91c1c !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .grid-master { display: grid; grid-template-columns: repeat(auto-fill, minmax(55px, 1fr)); gap: 6px; max-height: 500px; overflow-y: auto; padding: 15px; border-radius: 1rem; background: #f1f5f9; }
+        .num-box { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; }
+        .num-box:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .num-box.vendido { background-color: #ef4444 !important; color: white !important; border-color: #dc2626; }
+        .num-box.seleccionado { background-color: #3b82f6 !important; color: white !important; scale: 1.1; z-index: 10; border-radius: 50%; }
+        .tooltip-admin { display: none; position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background: #0f172a; color: white; padding: 5px 10px; border-radius: 8px; font-size: 11px; white-space: nowrap; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .num-box:hover .tooltip-admin { display: block; }
+        .search-highlight { border: 3px solid #f59e0b !important; box-shadow: 0 0 15px #f59e0b; background-color: #fffbeb !important; color: #92400e !important; }
     </style>
 </head>
-<body class="bg-slate-50 italic text-slate-800">
+<body class="bg-gray-100 text-slate-900 italic">
 
-    <header class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-2xl sticky top-0 z-50 border-b-4 border-orange-500">
-        <h1 class="font-black uppercase tracking-tighter text-2xl italic">💎 Diego&Corporation</h1>
-        <button id="btnAdmin" class="bg-orange-500 hover:bg-orange-600 w-10 h-10 rounded-full border-2 border-white shadow-lg flex items-center justify-center transition-all active:scale-90"><i class="fas fa-cog"></i></button>
-    </header>
+    <nav class="bg-slate-900 text-white p-5 sticky top-0 z-[100] border-b-4 border-blue-600 shadow-2xl flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="bg-blue-600 w-10 h-10 rounded-lg flex items-center justify-center rotate-3 shadow-lg">
+                <i class="fas fa-gem text-white"></i>
+            </div>
+            <h1 class="font-black uppercase tracking-tighter text-2xl italic">Diego<span class="text-blue-500">&</span>Corp</h1>
+        </div>
+        <button id="masterLock" class="bg-white/10 hover:bg-white/20 w-12 h-12 rounded-2xl transition-all border border-white/20">
+            <i class="fas fa-fingerprint text-xl"></i>
+        </button>
+    </nav>
 
-    <main class="max-w-7xl mx-auto p-4">
-        <div id="adminPanel" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
-            <div class="bg-white rounded-[2.5rem] shadow-2xl border-4 border-blue-900 overflow-hidden mb-10">
-                <div class="bg-blue-900 p-4 text-white flex justify-between items-center">
-                    <h2 class="font-black uppercase italic flex items-center gap-2"><i class="fas fa-terminal"></i> Consola de Administración</h2>
-                    <div id="statsAdmin" class="text-[10px] font-bold bg-blue-800 px-3 py-1 rounded-full border border-blue-700">Cargando...</div>
-                </div>
-                
-                <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div class="lg:col-span-4 space-y-3 bg-slate-50 p-4 rounded-3xl border border-slate-200">
-                        <h3 class="font-black text-blue-900 uppercase text-xs">Nueva Rifa Flash</h3>
-                        <input type="text" id="nombreRifa" class="w-full p-3 bg-white border-2 border-slate-200 rounded-2xl focus:border-blue-500 outline-none text-sm" placeholder="Nombre del Premio">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="number" id="precioRifa" class="p-3 bg-white border-2 border-slate-200 rounded-2xl text-sm" placeholder="Bs.">
-                            <input type="number" id="cantidadNumeros" class="p-3 bg-white border-2 border-slate-200 rounded-2xl text-sm" placeholder="Total N°">
+    <main class="max-w-7xl mx-auto p-4 lg:p-8">
+        
+        <div id="adminArea" class="hidden space-y-6 mb-12 animate-in fade-in duration-500">
+            <div class="bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <h2 class="text-white font-black uppercase italic tracking-widest"><i class="fas fa-crown text-blue-500 mr-2"></i> Centro de Control Premium</h2>
+                    <div id="quickStats" class="flex gap-4">
+                        <div class="bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Disponibles</p>
+                            <p id="statDisp" class="text-green-400 font-black">-</p>
                         </div>
-                        <input type="file" id="archivoFoto" class="w-full text-[10px] file:bg-blue-900 file:text-white file:border-none file:px-4 file:py-2 file:rounded-full cursor-pointer" accept="image/*">
-                        <button id="btnGuardar" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-2xl shadow-lg uppercase transition-all">Lanzar Rifa</button>
+                        <div class="bg-slate-800 px-4 py-2 rounded-xl border border-slate-700 text-center">
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">Vendidos</p>
+                            <p id="statVend" class="text-red-400 font-black">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <div class="lg:col-span-4 space-y-4">
+                        <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100">
+                            <h3 class="font-black text-blue-900 text-sm uppercase mb-4 italic">Crear Nuevo Sorteo</h3>
+                            <div class="space-y-3">
+                                <input type="text" id="addNombre" class="w-full p-4 rounded-2xl border-0 shadow-sm outline-none focus:ring-2 ring-blue-500" placeholder="Nombre del Premio">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" id="addPrecio" class="p-4 rounded-2xl border-0 shadow-sm outline-none focus:ring-2 ring-blue-500" placeholder="Precio Bs.">
+                                    <input type="number" id="addCantidad" class="p-4 rounded-2xl border-0 shadow-sm outline-none focus:ring-2 ring-blue-500" placeholder="Cant. N°">
+                                </div>
+                                <label class="block">
+                                    <span class="sr-only">Elegir Imagen</span>
+                                    <input type="file" id="addFoto" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-black file:bg-blue-900 file:text-white hover:file:bg-black cursor-pointer">
+                                </label>
+                                <button id="btnLaunch" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase tracking-tighter">Publicar Sorteo</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="lg:col-span-8 space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <select id="selectRifasAdmin" class="w-full p-3 border-2 border-blue-100 rounded-2xl font-bold bg-white text-sm"></select>
-                            <div class="relative">
-                                <input type="text" id="adminNombreVenta" class="w-full p-3 bg-yellow-50 border-2 border-yellow-400 rounded-2xl text-sm font-black uppercase placeholder:italic" placeholder="BUSCAR CLIENTE O ASIGNAR A...">
-                                <span id="countSearch" class="absolute right-3 top-3 bg-orange-500 text-white text-[10px] px-2 py-1 rounded-md font-black">0</span>
-                            </div>
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <select id="activeRifaSelect" class="flex-1 p-4 rounded-2xl bg-slate-100 font-black border-2 border-transparent focus:border-blue-500 outline-none"></select>
+                            <input type="text" id="adminSearch" class="flex-1 p-4 rounded-2xl bg-yellow-50 font-black border-2 border-yellow-200 outline-none placeholder:text-yellow-700/30 uppercase" placeholder="Buscar Cliente o Marcar...">
                         </div>
-
-                        <div class="flex gap-2 bg-blue-50 p-3 rounded-2xl border border-blue-100">
-                            <input type="text" id="inputEnlaceMasivo" class="flex-1 p-2 rounded-xl text-xs border border-blue-200" placeholder="Pegar números separados por coma (ej: 05, 12, 44)">
-                            <button id="btnEnlaceMasivo" class="bg-blue-900 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase hover:bg-black transition-all">Enlazar</button>
-                        </div>
-
-                        <div id="adminGridNumeros" class="grid-admin"></div>
                         
-                        <div class="flex justify-between items-center gap-4">
-                            <button id="btnEliminar" class="bg-red-100 text-red-600 hover:bg-red-600 hover:text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase transition-all">Borrar Sorteo</button>
-                            <p class="text-[10px] text-slate-400 font-bold">* Toca un número para asignarlo/liberarlo individualmente</p>
+                        <div class="bg-slate-900 p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center">
+                            <i class="fas fa-link text-blue-400 ml-2"></i>
+                            <input type="text" id="masivoInput" class="flex-1 bg-transparent border-b-2 border-slate-700 p-2 text-white outline-none focus:border-blue-500 text-sm font-mono" placeholder="Enlazar varios N° separados por coma (ej: 01, 15, 88)">
+                            <button id="btnMasivo" class="bg-blue-500 text-white px-6 py-2 rounded-xl font-black text-xs uppercase hover:bg-blue-400 transition-all">Enlazar</button>
+                        </div>
+
+                        <div id="adminGrid" class="grid-master border-2 border-slate-200"></div>
+                        
+                        <div class="flex justify-between">
+                            <button id="btnDelRifa" class="text-red-500 font-black text-xs uppercase hover:underline"><i class="fas fa-trash-alt mr-1"></i> Eliminar Sorteo Seleccionado</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="contenedorRifas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        <div id="rifasList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
     </main>
 
-    <div id="formCompra" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-2">
-        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="cerrarModal()"></div>
-        <div class="bg-white relative w-full max-w-lg rounded-[3rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl border-4 border-blue-900">
-            <div class="bg-blue-900 p-5 text-white flex justify-between items-center">
-                <h2 class="font-black uppercase italic tracking-tighter">🛒 Reservar Tickets</h2>
-                <button onclick="cerrarModal()" class="bg-white/10 w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">&times;</button>
+    <div id="buyModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-xl" onclick="closeModal()"></div>
+        <div class="bg-white relative w-full max-w-xl rounded-[3rem] overflow-hidden flex flex-col max-h-[92vh] shadow-[0_35px_60px_-15px_rgba(0,0,0,0.5)] border-4 border-slate-900">
+            <div class="bg-slate-900 p-6 text-white flex justify-between items-center">
+                <h3 class="font-black italic uppercase tracking-widest text-lg">Reserva de Tickets</h3>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-red-500 transition-colors flex items-center justify-center">&times;</button>
             </div>
             
-            <div class="p-6 overflow-y-auto space-y-5">
-                <div class="grid grid-cols-1 gap-3">
-                    <input type="number" id="inputNumeroManual" class="w-full p-5 border-4 border-slate-100 rounded-3xl font-black text-center text-3xl outline-none focus:border-blue-500 transition-all" placeholder="00">
-                    <div id="statusBusqueda" class="text-center text-[10px] font-black uppercase"></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button id="btnAgregarManual" class="bg-blue-900 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md active:scale-95 transition-all">Confirmar N°</button>
-                        <button id="btnSuerte" class="bg-purple-600 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-md active:scale-95 transition-all"><i class="fas fa-dice"></i> Al Azar</button>
+            <div class="p-8 overflow-y-auto space-y-6">
+                <div class="bg-blue-50 p-6 rounded-[2.5rem] border-2 border-blue-100 text-center">
+                    <p class="text-[10px] font-black uppercase text-blue-900 mb-2">Ingresa tu número o usa el azar</p>
+                    <div class="flex flex-col gap-3">
+                        <input type="number" id="numInput" class="w-full p-4 rounded-2xl border-0 shadow-inner font-black text-4xl text-center outline-none focus:ring-4 ring-blue-500" placeholder="00">
+                        <div id="numStatus" class="text-[11px] font-black uppercase"></div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="btnAddNum" class="bg-blue-600 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-lg active:scale-95 transition-all">Confirmar N°</button>
+                            <button id="btnAzar" class="bg-purple-600 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-lg active:scale-95 transition-all"><i class="fas fa-dice mr-1"></i> Al Azar</button>
+                        </div>
                     </div>
                 </div>
 
-                <div id="listaSeleccionados" class="flex flex-wrap justify-center gap-2 p-2 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 min-h-[60px]"></div>
+                <div id="selBox" class="flex flex-wrap justify-center gap-3 min-h-[50px]"></div>
 
-                <div class="bg-blue-900 text-white p-5 rounded-[2rem] text-center relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-2 opacity-10 italic font-black text-4xl leading-none">PAGO</div>
-                    <p class="text-[10px] font-black text-blue-300 uppercase mb-1">Pago Móvil Banesco (0134)</p>
-                    <p class="font-black text-xl">0412-6324690 • 33.854.892</p>
-                    <div id="montoTotal" class="text-3xl font-black text-green-400 mt-2">Bs. 0.00</div>
+                <div class="bg-slate-900 text-white p-6 rounded-[2.5rem] relative">
+                    <div class="absolute -right-4 -top-4 bg-green-500 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase">Activo</div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pago Móvil Banesco (0134)</p>
+                    <p class="text-xl font-black">0412-6324690 • 33.854.892</p>
+                    <div id="totalLabel" class="text-4xl font-black text-green-400 mt-3">Bs. 0.00</div>
                 </div>
 
-                <div class="space-y-2">
-                    <input type="text" id="nomC" class="w-full p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Nombre completo">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="cedC" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Cédula">
-                        <input type="number" id="telC" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="WhatsApp">
-                    </div>
-                    <input type="number" id="tel2C" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Teléfono Alternativo">
-                    <input type="text" id="dirC" class="p-3 border-2 border-slate-100 rounded-xl font-bold" placeholder="Dirección">
-                    <input type="text" id="refC" class="w-full p-4 border-4 border-yellow-400 rounded-2xl font-black text-center text-2xl placeholder:text-slate-300" placeholder="REF. PAGO (4 DÍGITOS)">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="cNombre" class="md:col-span-2 p-4 bg-slate-100 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500" placeholder="Nombre y Apellido *">
+                    <input type="number" id="cCedula" class="p-4 bg-slate-100 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500" placeholder="Cédula *">
+                    <input type="number" id="cTel" class="p-4 bg-slate-100 rounded-2xl font-bold outline-none border-2 border-transparent focus:border-blue-500" placeholder="WhatsApp *">
+                    <input type="text" id="cRef" class="md:col-span-2 p-5 bg-yellow-50 border-4 border-yellow-400 rounded-2xl font-black text-center text-2xl outline-none" placeholder="REF. PAGO (4 ÚLTIMOS) *">
                 </div>
 
-                <button id="btnWhatsApp" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-[2rem] text-xl uppercase shadow-xl transition-all flex items-center justify-center gap-3"><i class="fab fa-whatsapp"></i> Enviar a Diego</button>
+                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-6 rounded-3xl text-xl uppercase shadow-2xl hover:bg-green-700 transition-all flex items-center justify-center gap-4">
+                    <i class="fab fa-whatsapp text-2xl"></i> Enviar a Diego
+                </button>
             </div>
         </div>
     </div>
@@ -123,150 +149,138 @@
         const db = getDatabase(app);
         const storage = getStorage(app);
         const rifasRef = ref(db, 'rifas');
-        let seleccionados = [];
+        let selectedNumbers = [];
 
-        window.cerrarModal = () => { document.getElementById('formCompra').classList.add('hidden'); seleccionados = []; actualizarUI(); };
-        document.getElementById('btnAdmin').onclick = () => { if(prompt("Acceso Admin:") === "051011") document.getElementById('adminPanel').classList.toggle('hidden'); };
+        window.closeModal = () => { document.getElementById('buyModal').classList.add('hidden'); selectedNumbers = []; updateUI(); };
+        document.getElementById('masterLock').onclick = () => { if(prompt("Acceso Maestro:") === "051011") document.getElementById('adminArea').classList.toggle('hidden'); };
 
-        // PUBLICACIÓN INSTANTÁNEA
-        document.getElementById('btnGuardar').onclick = async () => {
-            const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
-            if(!n || !f || !c) return alert("Faltan campos");
+        // PUBLICAR FLASH
+        document.getElementById('btnLaunch').onclick = async () => {
+            const n = document.getElementById('addNombre').value, p = document.getElementById('addPrecio').value, c = document.getElementById('addCantidad').value, f = document.getElementById('addFoto').files[0];
+            if(!n || !f || !c) return alert("¡Completa todos los datos!");
+            
             const id = push(rifasRef).key;
             const reader = new FileReader();
             reader.readAsDataURL(f);
             reader.onload = async () => {
                 await set(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: reader.result, vendidos: "", compradores: {} });
-                document.getElementById('adminPanel').classList.add('hidden');
-                uploadBytes(sRef(storage, `sorteos/${id}`), f).then(async (s) => {
+                document.getElementById('addNombre').value = ""; document.getElementById('addFoto').value = "";
+                uploadBytes(sRef(storage, `fotos/${id}`), f).then(async (s) => {
                     const url = await getDownloadURL(s.ref);
                     update(ref(db, `rifas/${id}`), { imagen: url });
                 });
             };
         };
 
+        // ESCUCHA DE RIFAS
         onValue(rifasRef, (snap) => {
-            const cont = document.getElementById('contenedorRifas'), selA = document.getElementById('selectRifasAdmin');
-            cont.innerHTML = ""; selA.innerHTML = '<option value="">-- SELECCIONAR RIFA PARA GESTIONAR --</option>';
+            const list = document.getElementById('rifasList'), select = document.getElementById('activeRifaSelect');
+            list.innerHTML = ""; select.innerHTML = '<option value="">-- SELECCIONAR PARA GESTIONAR --</option>';
             const data = snap.val(); if(!data) return;
+            
             Object.keys(data).reverse().forEach(id => {
                 const r = data[id];
-                selA.innerHTML += `<option value="${id}">${r.nombre}</option>`;
+                select.innerHTML += `<option value="${id}">${r.nombre}</option>`;
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-[2.5rem] shadow-xl p-5 text-center border-2 border-slate-100 hover:border-blue-200 transition-all";
-                card.innerHTML = `<img src="${r.imagen}" class="h-64 w-full object-cover rounded-[2rem] mb-4 shadow-inner"><h3 class="font-black uppercase text-lg leading-tight mb-1">${r.nombre}</h3><p class="text-blue-600 font-black text-2xl">Bs. ${r.precio}</p><button class="w-full bg-blue-900 text-white py-4 rounded-2xl mt-4 font-black uppercase text-xs tracking-widest hover:bg-black transition-all shadow-lg active:scale-95">¡Participar!</button>`;
-                card.querySelector('button').onclick = () => { window.currentR = { ...r, id }; document.getElementById('formCompra').classList.remove('hidden'); };
-                cont.appendChild(card);
+                card.className = "bg-white rounded-[3rem] shadow-xl p-5 text-center border-2 border-transparent hover:border-blue-500 transition-all group cursor-pointer";
+                card.innerHTML = `<div class="relative overflow-hidden rounded-[2rem] mb-4"><img src="${r.imagen}" class="h-64 w-full object-cover group-hover:scale-110 transition-transform duration-500"></div><h3 class="font-black uppercase text-lg italic">${r.nombre}</h3><p class="text-blue-600 font-black text-2xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-4 rounded-2xl mt-4 font-black uppercase text-xs tracking-widest group-hover:bg-blue-600 transition-colors">Participar Ahora</button>`;
+                card.onclick = () => { window.activeR = { ...r, id }; document.getElementById('buyModal').classList.remove('hidden'); };
+                list.appendChild(card);
             });
         });
 
-        // BUSCADOR EN TIEMPO REAL
-        document.getElementById('adminNombreVenta').oninput = (e) => {
-            const search = e.target.value.toLowerCase(), boxes = document.querySelectorAll('.num-admin');
-            let count = 0;
-            boxes.forEach(box => {
-                const comp = box.getAttribute('data-comp').toLowerCase();
-                if(search !== "" && comp.includes(search)) { box.classList.add('highlight-search'); count++; }
-                else { box.classList.remove('highlight-search'); }
+        // BUSCADOR EN PANEL ADMIN
+        document.getElementById('adminSearch').oninput = (e) => {
+            const s = e.target.value.toLowerCase(), boxes = document.querySelectorAll('.num-box');
+            boxes.forEach(b => {
+                const comp = b.getAttribute('data-comp').toLowerCase();
+                if(s !== "" && comp.includes(s)) b.classList.add('search-highlight');
+                else b.classList.remove('search-highlight');
             });
-            document.getElementById('countSearch').innerText = count;
         };
 
-        // GESTIÓN DINÁMICA DE GRILLA
-        document.getElementById('selectRifasAdmin').onchange = (e) => {
-            const id = e.target.value, grid = document.getElementById('adminGridNumeros'), stats = document.getElementById('statsAdmin');
-            if(!id) { grid.innerHTML = ""; stats.innerText = "Esperando selección..."; return; }
+        // GESTIÓN DE GRILLA ADMIN
+        document.getElementById('activeRifaSelect').onchange = (e) => {
+            const id = e.target.value, grid = document.getElementById('adminGrid');
+            if(!id) { grid.innerHTML = ""; return; }
             onValue(ref(db, `rifas/${id}`), (snapshot) => {
                 const r = snapshot.val(); if(!r) return;
                 grid.innerHTML = "";
                 let vArr = r.vendidos ? r.vendidos.split(',') : [], comps = r.compradores || {};
-                stats.innerText = `TOTAL: ${r.cantidad} | VENDIDOS: ${vArr.length} | DISP: ${r.cantidad - vArr.length}`;
-                
-                for(let i=0; i < r.cantidad; i++) {
-                    let n = i.toString().padStart(r.cantidad.toString().length, '0'), btn = document.createElement('div'), name = comps[n] || "";
-                    btn.className = `num-admin p-2 text-[10px] font-black border rounded-lg text-center ${vArr.includes(n) ? 'is-vendido' : 'bg-white text-slate-400'}`;
-                    btn.setAttribute('data-comp', name); btn.innerHTML = `${n} <span class="tooltip">${name || 'LIBRE'}</span>`;
-                    btn.onclick = async () => {
-                        let nom = document.getElementById('adminNombreVenta').value || "VENDIDO";
-                        let snap = await get(ref(db, `rifas/${id}`));
-                        let curV = snap.val().vendidos ? snap.val().vendidos.split(',').filter(x=>x!="") : [], newC = snap.val().compradores || {};
-                        if(curV.includes(n)) { curV = curV.filter(x => x !== n); delete newC[n]; }
+                document.getElementById('statDisp').innerText = r.cantidad - vArr.filter(x=>x!=="").length;
+                document.getElementById('statVend').innerText = vArr.filter(x=>x!=="").length;
+
+                for(let i=0; i<r.cantidad; i++) {
+                    const n = i.toString().padStart(r.cantidad.toString().length, '0'), b = document.createElement('div'), name = comps[n] || "";
+                    b.className = `num-box p-2 text-[10px] font-black border rounded-lg text-center ${vArr.includes(n) ? 'vendido' : 'bg-white text-slate-400'}`;
+                    b.setAttribute('data-comp', name); b.innerHTML = `${n} <span class="tooltip-admin">${name || 'LIBRE'}</span>`;
+                    b.onclick = async () => {
+                        let nom = document.getElementById('adminSearch').value || "VENDIDO";
+                        let sActual = await get(ref(db, `rifas/${id}`));
+                        let curV = sActual.val().vendidos ? sActual.val().vendidos.split(',').filter(x=>x!=="") : [], newC = sActual.val().compradores || {};
+                        if(curV.includes(n)) { curV = curV.filter(x=>x!==n); delete newC[n]; }
                         else { curV.push(n); newC[n] = nom; }
                         update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
                     };
-                    grid.appendChild(btn);
+                    grid.appendChild(b);
                 }
             });
         };
 
-        // ENLACE MASIVO (Asociar lista de números a un nombre)
-        document.getElementById('btnEnlaceMasivo').onclick = async () => {
-            const id = document.getElementById('selectRifasAdmin').value;
-            const lista = document.getElementById('inputEnlaceMasivo').value;
-            const nombre = document.getElementById('adminNombreVenta').value || "CLIENTE";
-            if(!id || !lista) return alert("Selecciona rifa y pega números");
-            
-            let numsAEnlazar = lista.split(',').map(n => n.trim());
+        // ENLACE MASIVO ADMIN
+        document.getElementById('btnMasivo').onclick = async () => {
+            const id = document.getElementById('activeRifaSelect').value, list = document.getElementById('masivoInput').value, nom = document.getElementById('adminSearch').value || "CLIENTE";
+            if(!id || !list) return;
+            let nums = list.split(',').map(x=>x.trim());
             let snap = await get(ref(db, `rifas/${id}`));
-            let data = snap.val();
-            let curV = data.vendidos ? data.vendidos.split(',').filter(x=>x!="") : [];
-            let newC = data.compradores || {};
-
-            numsAEnlazar.forEach(n => {
+            let data = snap.val(), curV = data.vendidos ? data.vendidos.split(',').filter(x=>x!=="") : [], newC = data.compradores || {};
+            nums.forEach(n => {
                 let padN = n.padStart(data.cantidad.toString().length, '0');
                 if(!curV.includes(padN)) curV.push(padN);
-                newC[padN] = nombre;
+                newC[padN] = nom;
             });
-
             await update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
-            document.getElementById('inputEnlaceMasivo').value = "";
-            alert("Números enlazados con éxito");
+            document.getElementById('masivoInput').value = "";
         };
 
         // LÓGICA DE COMPRA USUARIO
-        document.getElementById('inputNumeroManual').oninput = (e) => {
-            const val = e.target.value, status = document.getElementById('statusBusqueda');
-            if(!val) { status.innerText = ""; return; }
-            const num = val.padStart(window.currentR.cantidad.toString().length, '0');
-            const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-            if(parseInt(num) >= window.currentR.cantidad) { status.innerHTML = "<span class='text-red-500'>❌ NO EXISTE</span>"; }
-            else if(vArr.includes(num)) { status.innerHTML = "<span class='text-red-500'>🚫 AGOTADO</span>"; }
-            else { status.innerHTML = "<span class='text-green-600 font-black'>✅ DISPONIBLE</span>"; }
+        document.getElementById('numInput').oninput = (e) => {
+            const v = e.target.value, status = document.getElementById('numStatus'), r = window.activeR;
+            if(!v) return status.innerText = "";
+            const n = v.padStart(r.cantidad.toString().length, '0'), vArr = r.vendidos ? r.vendidos.split(',') : [];
+            if(parseInt(n) >= r.cantidad) { status.innerText = "❌ NO EXISTE"; status.style.color = "red"; }
+            else if(vArr.includes(n)) { status.innerText = "🚫 VENDIDO"; status.style.color = "red"; }
+            else { status.innerText = "✅ DISPONIBLE"; status.style.color = "green"; }
         };
 
-        document.getElementById('btnAgregarManual').onclick = () => {
-            const input = document.getElementById('inputNumeroManual'), num = input.value.padStart(window.currentR.cantidad.toString().length, '0');
-            const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return;
-            seleccionados.push(num); input.value = ""; document.getElementById('statusBusqueda').innerText = ""; actualizarUI();
+        document.getElementById('btnAddNum').onclick = () => {
+            const i = document.getElementById('numInput'), n = i.value.padStart(window.activeR.cantidad.toString().length, '0'), vArr = window.activeR.vendidos ? window.activeR.vendidos.split(',') : [];
+            if(parseInt(n) >= window.activeR.cantidad || vArr.includes(n) || selectedNumbers.includes(n)) return;
+            selectedNumbers.push(n); i.value = ""; document.getElementById('numStatus').innerText = ""; updateUI();
         };
 
-        document.getElementById('btnSuerte').onclick = () => {
-            const r = window.currentR, vArr = r.vendidos ? r.vendidos.split(',') : [];
-            if (vArr.length + seleccionados.length >= r.cantidad) return alert("SORTEO AGOTADO");
-            let azar;
-            do { azar = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0'); } 
-            while (vArr.includes(azar) || seleccionados.includes(azar));
-            seleccionados.push(azar); actualizarUI();
+        document.getElementById('btnAzar').onclick = () => {
+            const r = window.activeR, vArr = r.vendidos ? r.vendidos.split(',') : [];
+            if(vArr.length + selectedNumbers.length >= r.cantidad) return alert("Sorteo Agotado");
+            let a; do { a = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0'); } while(vArr.includes(a) || selectedNumbers.includes(a));
+            selectedNumbers.push(a); updateUI();
         };
 
-        function actualizarUI() {
-            document.getElementById('listaSeleccionados').innerHTML = seleccionados.map(n => `<span class="bg-blue-900 text-white px-4 py-2 rounded-xl font-black text-lg animate-bounce">#${n}</span>`).join('');
-            document.getElementById('montoTotal').innerText = `Bs. ${(seleccionados.length * window.currentR.precio).toFixed(2)}`;
+        function updateUI() {
+            document.getElementById('selBox').innerHTML = selectedNumbers.map(n => `<span class="bg-blue-600 text-white px-5 py-2 rounded-2xl font-black text-xl shadow-lg">#${n}</span>`).join('');
+            document.getElementById('totalLabel').innerText = `Bs. ${(selectedNumbers.length * window.activeR.precio).toFixed(2)}`;
         }
 
-        document.getElementById('btnWhatsApp').onclick = () => {
-            const inputs = ['nomC', 'cedC', 'telC', 'tel2C', 'dirC', 'refC'];
-            for(let i of inputs) if(!document.getElementById(i).value) return alert("Por favor, llena todos los campos");
-            if(!seleccionados.length) return alert("Selecciona al menos un ticket");
-            
-            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${document.getElementById('nomC').value}%0A*C.I:* ${document.getElementById('cedC').value}%0A*WhatsApp:* ${document.getElementById('telC').value}%0A*Ref. Pago:* ${document.getElementById('refC').value}`;
+        document.getElementById('btnFinalizar').onclick = () => {
+            const n = document.getElementById('cNombre').value, c = document.getElementById('cCedula').value, t = document.getElementById('cTel').value, r = document.getElementById('cRef').value;
+            if(!n || !c || !t || !r || !selectedNumbers.length) return alert("Completa el formulario");
+            const msj = `*DIEGO%26CORP*%0A*Sorteo:* ${window.activeR.nombre}%0A*Tickets:* ${selectedNumbers.join(", ")}%0A*Monto:* ${document.getElementById('totalLabel').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*WhatsApp:* ${t}%0A*Referencia:* ${r}`;
             window.open(`https://wa.me/584126324690?text=${msj}`, '_blank');
         };
 
-        document.getElementById('btnEliminar').onclick = () => {
-            const id = document.getElementById('selectRifasAdmin').value;
-            if(id && confirm("¿BORRAR ESTA RIFA POR COMPLETO?")) remove(ref(db, `rifas/${id}`));
+        document.getElementById('btnDelRifa').onclick = () => {
+            const id = document.getElementById('activeRifaSelect').value;
+            if(id && confirm("¿BORRAR SORTEO DEFINITIVAMENTE?")) remove(ref(db, `rifas/${id}`));
         };
     </script>
 </body>
