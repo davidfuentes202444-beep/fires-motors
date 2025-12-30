@@ -22,7 +22,7 @@
                     <input type="text" id="nombreRifa" class="w-full p-2 bg-slate-50 border rounded-xl" placeholder="Premio">
                     <div class="grid grid-cols-2 gap-2">
                         <input type="number" id="precioRifa" class="p-2 bg-slate-50 border rounded-xl" placeholder="Precio Bs.">
-                        <input type="number" id="cantidadNumeros" class="p-2 bg-slate-50 border rounded-xl" placeholder="Cantidad (ej. 10000)">
+                        <input type="number" id="cantidadNumeros" class="p-2 bg-slate-50 border rounded-xl" placeholder="Cantidad">
                     </div>
                     <input type="file" id="archivoFoto" class="w-full text-xs" accept="image/*">
                     <button id="btnGuardar" class="w-full bg-green-600 text-white font-black py-3 rounded-xl shadow-lg">PUBLICAR YA</button>
@@ -41,45 +41,46 @@
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="cerrarModal()"></div>
         <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl">
             <div class="bg-blue-900 p-4 text-white flex justify-between items-center">
-                <h2 class="font-black uppercase italic">Datos de Compra</h2>
+                <h2 class="font-black uppercase italic">Finalizar Compra</h2>
                 <button onclick="cerrarModal()" class="text-2xl">&times;</button>
             </div>
             
             <div class="p-5 overflow-y-auto space-y-4">
                 <div class="grid grid-cols-1 gap-2">
-                    <div class="relative">
-                        <input type="number" id="inputNumeroManual" class="w-full p-4 border-2 border-blue-200 rounded-xl font-black text-center text-xl outline-none focus:border-blue-500" placeholder="Escribe un número">
-                        <div id="statusBusqueda" class="text-center text-[10px] font-black uppercase mt-1"></div>
-                    </div>
+                    <input type="number" id="inputNumeroManual" class="w-full p-4 border-2 border-blue-200 rounded-xl font-black text-center text-xl outline-none" placeholder="Número de Ticket">
+                    <div id="statusBusqueda" class="text-center text-[10px] font-black uppercase"></div>
                     <div class="grid grid-cols-2 gap-2">
-                        <button id="btnAgregarManual" class="bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-xs shadow-md">Agregar Selección</button>
-                        <button id="btnSuerte" class="bg-purple-600 text-white py-3 rounded-xl font-black shadow-md text-xs uppercase"><i class="fas fa-dice mr-1"></i> Al Azar</button>
+                        <button id="btnAgregarManual" class="bg-blue-600 text-white py-3 rounded-xl font-black uppercase text-xs">Agregar</button>
+                        <button id="btnSuerte" class="bg-purple-600 text-white py-3 rounded-xl font-black uppercase text-xs">Al Azar</button>
                     </div>
                 </div>
 
                 <div class="bg-slate-100 p-3 rounded-xl border">
-                    <p class="text-[9px] font-black uppercase text-slate-400 mb-1">Mis Números Seleccionados:</p>
                     <div id="listaSeleccionados" class="flex flex-wrap gap-2 text-blue-700 font-bold min-h-[20px]"></div>
                 </div>
 
-                <div class="bg-blue-900 text-white p-4 rounded-2xl text-center shadow-inner border-t-4 border-green-500">
-                    <p class="text-[9px] font-black text-blue-300 uppercase tracking-widest">PAGO MÓVIL BANESCO (0134)</p>
-                    <p class="font-black text-lg leading-tight">TELÉFONO: 0412-6324690 | C.I: 33.854.892</p>
-                    <p id="montoTotal" class="text-2xl font-black text-green-400 mt-1">Total: Bs. 0.00</p>
+                <div class="bg-green-100 border-2 border-green-600 p-4 rounded-2xl text-center">
+                    <h4 class="font-black text-green-800 text-xs uppercase mb-2">DATOS DE PAGO MÓVIL</h4>
+                    <p class="font-black text-slate-900 leading-tight">BANCO: <span class="text-blue-700">BANESCO (0134)</span></p>
+                    <p class="font-black text-slate-900">TELÉFONO: <span class="text-blue-700">0412-6324690</span></p>
+                    <p class="font-black text-slate-900">CÉDULA: <span class="text-blue-700">33.854.892</span></p>
+                    <div class="mt-2 bg-white rounded-lg p-2 border border-green-200">
+                        <p id="montoTotal" class="text-2xl font-black text-green-600">Bs. 0.00</p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 gap-2">
-                    <input type="text" id="nomC" class="p-2 border rounded-xl font-bold" placeholder="Nombre y Apellido (Requerido)">
+                    <input type="text" id="nomC" class="p-2 border rounded-xl font-bold" placeholder="Nombre y Apellido *">
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="cedC" class="p-2 border rounded-xl font-bold" placeholder="Cédula (Requerida)">
-                        <input type="number" id="telC" class="p-2 border rounded-xl font-bold" placeholder="WhatsApp (Requerido)">
+                        <input type="number" id="cedC" class="p-2 border rounded-xl font-bold" placeholder="Cédula *">
+                        <input type="number" id="telC" class="p-2 border rounded-xl font-bold" placeholder="WhatsApp *">
                     </div>
-                    <input type="number" id="tel2C" class="p-2 border rounded-xl font-bold" placeholder="Teléfono de Respaldo (Requerido)">
-                    <input type="text" id="dirC" class="p-2 border rounded-xl font-bold" placeholder="Dirección Corta (Requerida)">
-                    <input type="text" id="refC" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-xl" placeholder="Referencia (4 últimos)">
+                    <input type="number" id="tel2C" class="p-2 border rounded-xl font-bold" placeholder="Teléfono de Respaldo *">
+                    <input type="text" id="dirC" class="p-2 border rounded-xl font-bold" placeholder="Dirección Corta *">
+                    <input type="text" id="refC" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-xl" placeholder="Referencia (4 últimos) *">
                 </div>
 
-                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl hover:bg-green-700 active:scale-95 transition-all">Confirmar en WhatsApp</button>
+                <button id="btnWhatsApp" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl hover:bg-green-700">Enviar Pedido a WhatsApp</button>
             </div>
         </div>
     </div>
@@ -109,15 +110,11 @@
 
         document.getElementById('btnGuardar').onclick = async () => {
             const n = document.getElementById('nombreRifa').value, p = document.getElementById('precioRifa').value, c = document.getElementById('cantidadNumeros').value, f = document.getElementById('archivoFoto').files[0];
-            if(!n || !f) return alert("Faltan datos de la rifa");
+            if(!n || !f) return alert("Faltan datos");
             const id = push(rifasRef).key;
-            const tempUrl = URL.createObjectURL(f);
-            update(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: tempUrl, vendidos: "" });
+            const url = await uploadBytes(sRef(storage, `sorteos/${id}`), f).then(s => getDownloadURL(s.ref));
+            await update(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: url, vendidos: "" });
             document.getElementById('adminPanel').classList.add('hidden');
-            uploadBytes(sRef(storage, `sorteos/${id}`), f).then(async (snap) => {
-                const url = await getDownloadURL(snap.ref);
-                update(ref(db, `rifas/${id}`), { imagen: url });
-            });
         };
 
         onValue(rifasRef, (snap) => {
@@ -129,7 +126,7 @@
                 if(r.nombre){
                     selA.innerHTML += `<option value="${id}">${r.nombre}</option>`;
                     const card = document.createElement('div');
-                    card.className = "bg-white rounded-[2rem] shadow-xl p-4 text-center border transition-transform hover:scale-105";
+                    card.className = "bg-white rounded-[2rem] shadow-xl p-4 text-center border";
                     card.innerHTML = `<img src="${r.imagen}" class="h-48 w-full object-cover rounded-2xl mb-4"><h3 class="font-black uppercase">${r.nombre}</h3><p class="text-blue-600 font-black text-xl">Bs. ${r.precio}</p><button class="w-full bg-slate-900 text-white py-3 rounded-xl mt-4 font-black">COMPRAR</button>`;
                     card.querySelector('button').onclick = () => { window.currentR = { ...r, id }; document.getElementById('formCompra').classList.remove('hidden'); };
                     cont.appendChild(card);
@@ -143,16 +140,16 @@
             if(!val) { status.innerText = ""; return; }
             const num = val.padStart(window.currentR.cantidad.toString().length, '0');
             const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-            if(parseInt(num) >= window.currentR.cantidad) { status.innerText = "❌ FUERA DE RANGO"; status.className = "text-center text-[10px] font-black mt-1 text-red-500"; }
-            else if(vArr.includes(num)) { status.innerText = "🚫 YA VENDIDO"; status.className = "text-center text-[10px] font-black mt-1 text-red-500"; }
-            else { status.innerText = "✅ DISPONIBLE"; status.className = "text-center text-[10px] font-black mt-1 text-green-500"; }
+            if(parseInt(num) >= window.currentR.cantidad) { status.innerText = "❌ FUERA DE RANGO"; status.className = "text-center text-red-500 font-bold"; }
+            else if(vArr.includes(num)) { status.innerText = "🚫 VENDIDO"; status.className = "text-center text-red-500 font-bold"; }
+            else { status.innerText = "✅ DISPONIBLE"; status.className = "text-center text-green-600 font-bold"; }
         };
 
         document.getElementById('btnAgregarManual').onclick = () => {
             const input = document.getElementById('inputNumeroManual');
             const num = input.value.padStart(window.currentR.cantidad.toString().length, '0');
             const vArr = window.currentR.vendidos ? window.currentR.vendidos.split(',') : [];
-            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return alert("Número no disponible o inválido");
+            if(parseInt(num) >= window.currentR.cantidad || vArr.includes(num) || seleccionados.includes(num)) return alert("Número no disponible");
             seleccionados.push(num);
             input.value = ""; document.getElementById('statusBusqueda').innerText = "";
             actualizarUI();
@@ -173,25 +170,15 @@
         }
 
         document.getElementById('btnWhatsApp').onclick = () => {
-            const n = document.getElementById('nomC').value;
-            const c = document.getElementById('cedC').value;
-            const t = document.getElementById('telC').value;
-            const t2 = document.getElementById('tel2C').value;
-            const d = document.getElementById('dirC').value;
-            const r = document.getElementById('refC').value;
-
-            // VALIDACIÓN DE TODOS LOS CAMPOS OBLIGATORIOS
-            if(!n || !c || !t || !t2 || !d || !r || !seleccionados.length) {
-                return alert("DEBES RELLENAR TODOS LOS CAMPOS: Nombre, Cédula, WhatsApp, Respaldo, Dirección y Referencia.");
-            }
-
-            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${t2}%0A*Dir:* ${d}%0A*Ref:* ${r}`;
+            const n = document.getElementById('nomC').value, c = document.getElementById('cedC').value, t = document.getElementById('telC').value, t2 = document.getElementById('tel2C').value, d = document.getElementById('dirC').value, r = document.getElementById('refC').value;
+            if(!n || !c || !t || !t2 || !d || !r || !seleccionados.length) return alert("LLENA TODOS LOS CAMPOS OBLIGATORIOS (*)");
+            const msj = `*DIEGO%26CORPORATION*%0A*Sorteo:* ${window.currentR.nombre}%0A*Tickets:* ${seleccionados.join(", ")}%0A*Monto Total:* ${document.getElementById('montoTotal').innerText}%0A---%0A*Cliente:* ${n}%0A*C.I:* ${c}%0A*Telf:* ${t}%0A*Respaldo:* ${t2}%0A*Dir:* ${d}%0A*Ref:* ${r}`;
             window.open(`https://wa.me/584126324690?text=${msj}`, '_blank');
         };
 
         document.getElementById('btnEliminar').onclick = () => {
             const id = document.getElementById('selectRifasAdmin').value;
-            if(id && confirm("¿Borrar sorteo definitivamente?")) remove(ref(db, `rifas/${id}`));
+            if(id && confirm("¿Eliminar rifa?")) remove(ref(db, `rifas/${id}`));
         };
     </script>
 </body>
