@@ -3,35 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David&DiegoCorporation | Reservas</title>
+    <title>David&DiegoCorporation | Gestión Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .num-blur { filter: blur(5px); user-select: none; pointer-events: none; }
         .grid-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 4px; max-height: 300px; overflow-y: auto; padding: 10px; background: #f1f5f9; border-radius: 1rem; }
+        .num-admin { font-size: 9px; font-weight: 900; border-radius: 4px; border: 1px solid #e2e8f0; text-align: center; padding: 6px 0; background: white; cursor: pointer; }
         .num-admin.vendido { background: #ef4444 !important; color: white !important; cursor: not-allowed; pointer-events: none; }
         .panel-seccion { display: none; }
         .panel-seccion.activa { display: block; }
+        #notificacion { position: fixed; top: 20px; right: 20px; z-index: 1000; transition: 0.5s; transform: translateX(250%); }
+        #notificacion.show { transform: translateX(0); }
     </style>
 </head>
 <body class="bg-slate-50 italic text-slate-800">
 
+    <div id="notificacion" class="px-6 py-4 rounded-2xl font-black text-white shadow-2xl"></div>
+
     <header class="bg-slate-900 text-white p-4 shadow-2xl sticky top-0 z-50 border-b-4 border-blue-600">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="font-black uppercase italic tracking-tighter text-lg">💎 David&DiegoCorporation</h1>
-            <button id="masterLock" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-lock"></i></button>
+            <button id="masterLock" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-cog text-blue-400"></i></button>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto p-4">
+        
         <div id="adminArea" class="hidden space-y-4 mb-10 border-4 border-slate-900 rounded-[2.5rem] p-6 bg-white shadow-2xl">
             <div class="flex flex-wrap gap-2 justify-center mb-6 border-b pb-4">
-                <button onclick="verSeccion('sec-pagos')" class="bg-yellow-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Verificar Pagos</button>
-                <button onclick="verSeccion('sec-lista')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Clientes</button>
-                <button onclick="document.getElementById('adminArea').classList.add('hidden')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Cerrar</button>
+                <button onclick="verSeccion('sec-pagos')" class="bg-yellow-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">1. Verificar Pagos</button>
+                <button onclick="verSeccion('sec-vender')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">2. Marcar Vendidos</button>
+                <button onclick="verSeccion('sec-crear')" class="bg-green-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">3. Nueva Rifa</button>
+                <button onclick="verSeccion('sec-lista')" class="bg-orange-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">4. Base de Datos</button>
+                <button onclick="document.getElementById('adminArea').classList.add('hidden')" class="bg-red-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Salir</button>
             </div>
-            <div id="sec-pagos" class="panel-seccion activa"><div id="listaPendientes" class="space-y-2"></div></div>
-            <div id="sec-lista" class="panel-seccion"><div id="listaClientesBody" class="text-xs font-bold"></div></div>
+
+            <div id="sec-pagos" class="panel-seccion activa">
+                <h3 class="font-black text-xs uppercase mb-4 text-yellow-600 italic">Pagos por Verificar</h3>
+                <div id="listaPendientes" class="space-y-2"></div>
+            </div>
+
+            <div id="sec-vender" class="panel-seccion">
+                <div class="bg-blue-50 p-6 rounded-3xl border border-blue-100">
+                    <select id="activeRifaSelect" class="w-full p-3 bg-slate-900 text-white rounded-xl font-black text-xs mb-4"></select>
+                    <input type="text" id="adminSearch" class="w-full p-3 mb-4 bg-white border-2 border-blue-200 rounded-xl font-black uppercase text-xs" placeholder="Nombre del Cliente (Para enlazar)">
+                    <div id="adminGrid" class="grid-admin shadow-inner border bg-white"></div>
+                    <p class="text-[9px] mt-2 text-slate-500">* Toca un número para enlazarlo permanentemente al nombre escrito.</p>
+                </div>
+            </div>
+
+            <div id="sec-crear" class="panel-seccion space-y-4 bg-slate-50 p-6 rounded-3xl border">
+                <input type="text" id="addNombre" class="w-full p-3 rounded-xl border font-bold" placeholder="Nombre del Sorteo / Premio">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="addPrecio" class="p-3 rounded-xl border font-bold" placeholder="Precio Bs.">
+                    <input type="number" id="addCantidad" class="p-3 rounded-xl border font-bold" placeholder="Cant. Números (Ej: 100)">
+                </div>
+                <input type="file" id="addFoto" class="text-xs w-full" accept="image/*">
+                <button id="btnLaunch" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl uppercase">Publicar Sorteo</button>
+            </div>
+
+            <div id="sec-lista" class="panel-seccion">
+                <div id="listaClientesBody" class="space-y-2 text-[10px]"></div>
+            </div>
         </div>
 
         <div id="rifasList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
@@ -41,34 +75,28 @@
         <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm" onclick="closeModal()"></div>
         <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl">
             <div class="bg-slate-900 p-4 text-white flex justify-between items-center">
-                <h2 class="font-black uppercase italic text-sm">FORMULARIO DE RESERVA</h2>
+                <h2 class="font-black uppercase italic text-sm">RESERVAR TICKETS</h2>
                 <button onclick="closeModal()" class="text-xl">&times;</button>
             </div>
-
             <div class="p-6 overflow-y-auto space-y-4">
                 <div class="flex items-center gap-4 bg-purple-50 p-4 rounded-2xl border-2 border-purple-200">
-                    <span class="font-black text-xs uppercase">¿Cuántos números?</span>
+                    <span class="font-black text-xs uppercase">Cantidad:</span>
                     <input type="number" id="cantNums" value="1" min="1" class="w-20 p-2 rounded-lg border-2 border-purple-400 font-black text-center">
                     <button id="btnGenerar" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-black text-[10px] uppercase">Generar</button>
                 </div>
-
                 <div id="selBox" class="flex flex-wrap justify-center gap-2 p-4 bg-slate-50 rounded-2xl border-2 border-dashed min-h-[60px]"></div>
-
                 <div class="bg-slate-900 text-white p-4 rounded-2xl text-center">
-                    <p class="text-[9px] font-black uppercase text-blue-300">TOTAL A TRANSFERIR</p>
                     <div id="totalLabel" class="text-3xl font-black text-green-400">Bs. 0.00</div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" id="cNombre" class="p-3 bg-slate-100 rounded-xl font-bold text-xs" placeholder="Nombre Completo *">
-                    <input type="text" id="cCedula" class="p-3 bg-slate-100 rounded-xl font-bold text-xs" placeholder="Cédula de Identidad *">
-                    <input type="text" id="cTel" class="p-3 bg-slate-100 rounded-xl font-bold text-xs" placeholder="Teléfono WhatsApp *">
-                    <input type="text" id="cTel2" class="p-3 bg-slate-100 rounded-xl font-bold text-xs" placeholder="Teléfono de Respaldo *">
-                    <input type="text" id="cDireccion" class="p-3 bg-slate-100 rounded-xl font-bold text-xs col-span-2" placeholder="Dirección de Domicilio *">
-                    <input type="text" id="cRef" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-lg col-span-2" placeholder="REFERENCIA BANCARIA *">
+                    <input type="text" id="cNombre" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Nombre Completo *">
+                    <input type="text" id="cCedula" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Cédula *">
+                    <input type="text" id="cTel" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="WhatsApp *">
+                    <input type="text" id="cTel2" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Telf. Respaldo *">
+                    <input type="text" id="cDireccion" class="p-3 bg-slate-100 rounded-xl text-xs font-bold col-span-2" placeholder="Dirección *">
+                    <input type="text" id="cRef" class="p-4 border-4 border-yellow-400 rounded-xl font-black text-center text-lg col-span-2" placeholder="REF. PAGO *">
                 </div>
-
-                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl hover:bg-green-700">ENVIAR PARA VERIFICACIÓN</button>
+                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl text-lg uppercase shadow-xl">ENVIAR COMPROBANTE</button>
             </div>
         </div>
     </div>
@@ -82,109 +110,122 @@
         const db = getDatabase(app);
         let selectedNumbers = [];
 
-        document.getElementById('masterLock').onclick = () => { if(prompt("Pass:") === "051011") document.getElementById('adminArea').classList.toggle('hidden'); };
+        function notify(msg, type) {
+            const n = document.getElementById('notificacion');
+            n.innerText = msg;
+            n.className = `px-6 py-4 rounded-2xl font-black text-white shadow-2xl show ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+            setTimeout(() => n.classList.remove('show'), 2500);
+        }
 
-        // GENERAR NÚMEROS DIFUMINADOS
-        document.getElementById('btnGenerar').onclick = () => {
-            const cant = parseInt(document.getElementById('cantNums').value);
-            const r = window.activeR, vArr = r.vendidos ? r.vendidos.split(',') : [];
-            selectedNumbers = [];
-            
-            if(cant + vArr.length > r.cantidad) return alert("No hay suficientes números libres");
+        // --- ADMINISTRACIÓN ---
+        document.getElementById('masterLock').onclick = () => { if(prompt("Acceso David&Diego:") === "051011") document.getElementById('adminArea').classList.toggle('hidden'); };
 
-            while(selectedNumbers.length < cant) {
-                let n = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0');
-                if(!vArr.includes(n) && !selectedNumbers.includes(n)) selectedNumbers.push(n);
-            }
-
-            const box = document.getElementById('selBox');
-            box.innerHTML = selectedNumbers.map(n => `<span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-black num-blur">#${n}</span>`).join('');
-            document.getElementById('totalLabel').innerText = `Bs. ${(selectedNumbers.length * r.precio).toFixed(2)}`;
-        };
-
-        // FINALIZAR RESERVA
-        document.getElementById('btnFinalizar').onclick = async () => {
-            const datos = {
-                nombre: document.getElementById('cNombre').value,
-                cedula: document.getElementById('cCedula').value,
-                tel: document.getElementById('cTel').value,
-                tel2: document.getElementById('cTel2').value,
-                dir: document.getElementById('cDireccion').value,
-                ref: document.getElementById('cRef').value
+        // 3. GENERAR RIFA
+        document.getElementById('btnLaunch').onclick = async () => {
+            const n = document.getElementById('addNombre').value, p = document.getElementById('addPrecio').value, c = document.getElementById('addCantidad').value, f = document.getElementById('addFoto').files[0];
+            if(!n || !f || !c) return notify("Faltan datos", "error");
+            const id = push(ref(db, 'rifas')).key;
+            const reader = new FileReader(); reader.readAsDataURL(f);
+            reader.onload = async () => {
+                await set(ref(db, `rifas/${id}`), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: reader.result, vendidos: "", compradores: {} });
+                notify("RIFA GENERADA", "success");
             };
-
-            if(!datos.nombre || !datos.ref || !selectedNumbers.length) return alert("Por favor rellene todos los campos marcados con *");
-
-            await push(ref(db, 'pendientes'), {
-                ...datos,
-                numeros: selectedNumbers,
-                rifaId: window.activeR.id,
-                rifaNombre: window.activeR.nombre
-            });
-
-            alert("Reserva enviada con éxito. David&DiegoCorporation verificará su pago pronto.");
-            location.reload();
         };
 
-        // ADMIN: CARGAR PENDIENTES
+        // 2. MARCAR VENDIDOS (CUADRÍCULA)
+        document.getElementById('activeRifaSelect').onchange = (e) => {
+            const id = e.target.value, grid = document.getElementById('adminGrid');
+            if(!id) return grid.innerHTML = "";
+            onValue(ref(db, `rifas/${id}`), (snap) => {
+                const r = snap.val(); if(!r) return;
+                grid.innerHTML = "";
+                let vArr = r.vendidos ? r.vendidos.split(',').filter(x=>x!=="") : [];
+                for(let i=0; i<r.cantidad; i++){
+                    const n = i.toString().padStart(r.cantidad.toString().length, '0'), b = document.createElement('div');
+                    b.className = `num-admin ${vArr.includes(n) ? 'vendido' : ''}`; b.innerHTML = n;
+                    b.onclick = async () => {
+                        let nom = document.getElementById('adminSearch').value.toUpperCase();
+                        if(!nom) return notify("ESCRIBE UN NOMBRE", "error");
+                        if(!vArr.includes(n)) {
+                            let curV = [...vArr, n], newC = r.compradores || {}; newC[n] = nom;
+                            await update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
+                            notify("ENLAZADO", "success");
+                        }
+                    };
+                    grid.appendChild(b);
+                }
+            });
+        };
+
+        // 1. VERIFICAR PAGOS
         onValue(ref(db, 'pendientes'), (snap) => {
-            const container = document.getElementById('listaPendientes');
-            container.innerHTML = "";
+            const container = document.getElementById('listaPendientes'); container.innerHTML = "";
             const data = snap.val(); if(!data) return;
             Object.keys(data).forEach(id => {
                 const p = data[id];
                 const card = document.createElement('div');
-                card.className = "bg-slate-100 p-4 rounded-xl flex flex-col md:flex-row justify-between border-2 border-yellow-400";
-                card.innerHTML = `
-                    <div class="text-[10px]">
-                        <p class="font-black">CLIENTE: ${p.nombre} | C.I: ${p.cedula}</p>
-                        <p>DIR: ${p.dir} | TEL: ${p.tel} / ${p.tel2}</p>
-                        <p class="text-blue-600">RIFA: ${p.rifaNombre} | REF: ${p.ref}</p>
-                        <p class="bg-white p-1 mt-1 font-black">NÚMEROS: ${p.numeros.join(', ')}</p>
-                    </div>
-                    <div class="flex gap-2 items-center">
-                        <button onclick="confirmar('${id}')" class="bg-green-600 text-white px-4 py-2 rounded-lg font-black uppercase text-[10px]">Aprobar</button>
-                        <button onclick="borrar('${id}')" class="bg-red-600 text-white px-4 py-2 rounded-lg font-black uppercase text-[10px]">X</button>
-                    </div>`;
+                card.className = "bg-white p-3 rounded-xl border-l-4 border-yellow-500 shadow-sm flex justify-between items-center";
+                card.innerHTML = `<div class="text-[9px] font-bold"><p>${p.nombre} (REF: ${p.ref})</p><p class="text-blue-600">${p.rifaNombre} - [${p.numeros.join(', ')}]</p></div>
+                <div class="flex gap-1"><button onclick="confirmarP('${id}')" class="bg-green-600 text-white p-2 rounded text-[8px]">OK</button><button onclick="borrarP('${id}')" class="bg-red-600 text-white p-2 rounded text-[8px]">X</button></div>`;
                 container.appendChild(card);
             });
         });
 
-        window.confirmar = async (pId) => {
-            const pSnap = await get(ref(db, `pendientes/${pId}`));
-            const p = pSnap.val();
-            const rifaRef = ref(db, `rifas/${p.rifaId}`);
-            const rSnap = await get(rifaRef);
-            const rData = rSnap.val();
-
-            let curV = rData.vendidos ? rData.vendidos.split(',').filter(x=>x!=="") : [];
-            let newC = rData.compradores || {};
-
-            p.numeros.forEach(num => { curV.push(num); newC[num] = p.nombre; });
-
-            await update(rifaRef, { vendidos: curV.join(','), compradores: newC });
+        window.confirmarP = async (pId) => {
+            const p = (await get(ref(db, `pendientes/${pId}`))).val();
+            const rRef = ref(db, `rifas/${p.rifaId}`);
+            const rData = (await get(rRef)).val();
+            let curV = rData.vendidos ? rData.vendidos.split(',').filter(x=>x!=="") : [], newC = rData.compradores || {};
+            p.numeros.forEach(n => { curV.push(n); newC[n] = p.nombre; });
+            await update(rRef, { vendidos: curV.join(','), compradores: newC });
             await remove(ref(db, `pendientes/${pId}`));
-
-            const msg = `💎 *David%26DiegoCorporation*%0A✅ *COMPRA CONFIRMADA*%0A---%0A*Hola ${p.nombre}*%0A*Tus Números:* ${p.numeros.join(', ')}%0A*Sorteo:* ${p.rifaNombre}%0A*Cédula:* ${p.cedula}%0A---%0A¡Gracias por tu compra!`;
-            window.open(`https://wa.me/${p.tel}?text=${msg}`, '_blank');
+            window.open(`https://wa.me/${p.tel}?text=💎 *PAGO VERIFICADO* %0A*Números:* ${p.numeros.join(', ')} %0A*Sorteo:* ${p.rifaNombre}`, '_blank');
         };
 
-        // CARGA INICIAL
+        // --- CLIENTE ---
+        document.getElementById('btnGenerar').onclick = () => {
+            const cant = parseInt(document.getElementById('cantNums').value);
+            const r = window.activeR, vArr = r.vendidos ? r.vendidos.split(',') : [];
+            selectedNumbers = [];
+            while(selectedNumbers.length < cant) {
+                let n = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0');
+                if(!vArr.includes(n) && !selectedNumbers.includes(n)) selectedNumbers.push(n);
+            }
+            document.getElementById('selBox').innerHTML = selectedNumbers.map(n => `<span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-black num-blur">#${n}</span>`).join('');
+            document.getElementById('totalLabel').innerText = `Bs. ${(selectedNumbers.length * r.precio).toFixed(2)}`;
+        };
+
+        document.getElementById('btnFinalizar').onclick = async () => {
+            const n = document.getElementById('cNombre').value, r = document.getElementById('cRef').value;
+            if(!n || !r || !selectedNumbers.length) return alert("Faltan datos");
+            await push(ref(db, 'pendientes'), {
+                nombre: n.toUpperCase(), cedula: document.getElementById('cCedula').value, tel: document.getElementById('cTel').value, 
+                tel2: document.getElementById('cTel2').value, dir: document.getElementById('cDireccion').value,
+                ref: r, numeros: selectedNumbers, rifaId: window.activeR.id, rifaNombre: window.activeR.nombre
+            });
+            alert("Reporte enviado exitosamente.");
+            location.reload();
+        };
+
+        // --- CARGA DE DATOS ---
         onValue(ref(db, 'rifas'), (snap) => {
-            const list = document.getElementById('rifasList'); list.innerHTML = "";
+            const list = document.getElementById('rifasList'), select = document.getElementById('activeRifaSelect');
+            list.innerHTML = ""; select.innerHTML = '<option value="">-- SELECCIONAR --</option>';
             const data = snap.val(); if(!data) return;
             Object.keys(data).forEach(id => {
                 const r = data[id];
+                select.innerHTML += `<option value="${id}">${r.nombre}</option>`;
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-[2rem] shadow-lg p-4 text-center cursor-pointer";
-                card.innerHTML = `<img src="${r.imagen}" class="h-44 w-full object-cover rounded-2xl mb-2"><h3 class="font-black text-xs">${r.nombre}</h3><p class="text-blue-600 font-black">Bs. ${r.precio}</p>`;
+                card.innerHTML = `<img src="${r.imagen}" class="h-44 w-full object-cover rounded-2xl mb-2"><h3 class="font-black text-xs uppercase">${r.nombre}</h3><p class="text-blue-600 font-black">Bs. ${r.precio}</p>`;
                 card.onclick = () => { window.activeR = { ...r, id }; document.getElementById('buyModal').classList.remove('hidden'); };
                 list.appendChild(card);
             });
         });
 
-        window.closeModal = () => { document.getElementById('buyModal').classList.add('hidden'); selectedNumbers = []; document.getElementById('selBox').innerHTML = ""; };
         window.verSeccion = (id) => { document.querySelectorAll('.panel-seccion').forEach(s => s.classList.remove('activa')); document.getElementById(id).classList.add('activa'); };
+        window.closeModal = () => document.getElementById('buyModal').classList.add('hidden');
+        window.borrarP = (id) => remove(ref(db, `pendientes/${id}`));
     </script>
 </body>
 </html>
