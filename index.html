@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>David&DiegoCorporation | Elite Control</title>
+    <title>David&DiegoCorporation | Elite System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -26,7 +26,6 @@
     </header>
 
     <main class="max-w-7xl mx-auto p-4">
-        
         <div id="adminArea" class="hidden space-y-4 mb-10 border-4 border-slate-900 rounded-[2.5rem] p-6 bg-white shadow-2xl">
             <div class="flex flex-wrap gap-2 justify-center mb-6 border-b pb-4">
                 <button onclick="verSeccion('sec-pagos')" class="bg-yellow-500 text-white px-3 py-2 rounded-xl text-[9px] font-black uppercase">1. Pagos</button>
@@ -93,7 +92,7 @@
                     <input type="text" id="cTel" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="WhatsApp">
                     <input type="text" id="cRef" class="p-3 border-2 border-yellow-400 rounded-xl text-xs font-bold col-span-2 text-center" placeholder="REFERENCIA PAGO">
                 </div>
-                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl uppercase">Reportar Pago</button>
+                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl uppercase shadow-lg">Reportar Pago</button>
             </div>
         </div>
     </div>
@@ -110,6 +109,50 @@
 
         document.getElementById('masterLock').onclick = () => { if(prompt("Pass David&Diego:") === "051011") document.getElementById('adminArea').classList.toggle('hidden'); };
 
+        // REPORTE DEL CLIENTE (Mínimo 2 tickets + Redirección directa)
+        document.getElementById('btnFinalizar').onclick = async () => {
+            if(selectedNumbers.length < 2) return alert("La compra mínima es de 2 tickets.");
+            const n = document.getElementById('cNombre').value.toUpperCase();
+            const ced = document.getElementById('cCedula').value;
+            const r = document.getElementById('cRef').value;
+            const t = document.getElementById('cTel').value;
+
+            if(!n || !r || !t) return alert("Nombre, WhatsApp y Referencia son obligatorios.");
+
+            const datos = {
+                nombre: n, cedula: ced, ref: r, tel: t,
+                numeros: selectedNumbers, rifaId: window.activeR.id, rifaNombre: window.activeR.nombre
+            };
+
+            await push(ref(db, 'pendientes'), datos);
+
+            const texto = `💎 *NUEVO REPORTE DE PAGO* 💎%0A%0A👤 *Cliente:* ${n}%0A🆔 *Cédula:* ${ced}%0A🏆 *Sorteo:* ${datos.rifaNombre}%0A🎫 *Tickets:* ${selectedNumbers.join(' - ')}%0A💰 *Ref:* ${r}%0A%0A━━━━━━━━━━━━━━━━━━━━%0A✅ *Verifica en el panel administrativo.*`;
+            
+            alert("Reporte guardado. Pulsa OK para notificar por WhatsApp.");
+            window.location.href = `https://api.whatsapp.com/send?phone=${MI_WHATSAPP}&text=${texto}`;
+        };
+
+        // CONFIRMACIÓN DEL ADMIN (Al cliente)
+        window.confirmarP = async (pId) => {
+            const pSnap = await get(ref(db, `pendientes/${pId}`));
+            const p = pSnap.val();
+            const rRef = ref(db, `rifas/${p.rifaId}`);
+            const rSnap = await get(rRef);
+            const rData = rSnap.val();
+            
+            let curV = rData.vendidos ? rData.vendidos.split(',').filter(x=>x!=="") : [];
+            let newC = rData.compradores || {};
+            p.numeros.forEach(n => { if(!curV.includes(n)) { curV.push(n); newC[n] = p.nombre; } });
+
+            await update(rRef, { vendidos: curV.join(','), compradores: newC });
+            await remove(ref(db, `pendientes/${pId}`));
+
+            const textoCliente = `💎 *David Diego Corporation* 💎%0A✨ *¡COMPRA CONFIRMADA!* ✨%0A%0AHola *${p.nombre}*, tu pago ha sido verificado con éxito.%0A%0A🎫 *TUS NÚMEROS:*%0A👉 *[ ${p.numeros.join(' ] - [ ')} ]*%0A%0A🏆 *SORTEO:* ${p.rifaNombre}%0A%0A🍀 *¡Mucha suerte!*%0A━━━━━━━━━━━━━━━━━━━━%0A📲 *Gracias por tu confianza.*`;
+            
+            window.location.href = `https://api.whatsapp.com/send?phone=${p.tel}&text=${textoCliente}`;
+        };
+
+        // LIBERAR CLIENTE MANUALMENTE
         window.liberarCliente = async (rifaId, clienteNombre) => {
             if(!confirm(`¿Eliminar a ${clienteNombre} y liberar sus números?`)) return;
             const rRef = ref(db, `rifas/${rifaId}`);
@@ -121,9 +164,10 @@
             await update(rRef, { vendidos: curV.join(','), compradores: newC });
         };
 
+        // GENERAR TICKETS
         document.getElementById('btnGenerar').onclick = () => {
             const cant = parseInt(document.getElementById('cantNums').value);
-            if(cant < 2) return alert("La compra mínima es de 2 tickets.");
+            if(cant < 2) return alert("Mínimo 2 tickets.");
             const r = window.activeR, vArr = r.vendidos ? r.vendidos.split(',') : [];
             selectedNumbers = [];
             while(selectedNumbers.length < cant) {
@@ -134,34 +178,7 @@
             document.getElementById('totalLabel').innerText = `Bs. ${(selectedNumbers.length * r.precio).toFixed(2)}`;
         };
 
-        document.getElementById('btnFinalizar').onclick = async () => {
-            if(selectedNumbers.length < 2) return alert("Mínimo 2 tickets.");
-            const datos = {
-                nombre: document.getElementById('cNombre').value.toUpperCase(), cedula: document.getElementById('cCedula').value,
-                ref: document.getElementById('cRef').value, tel: document.getElementById('cTel').value,
-                numeros: selectedNumbers, rifaId: window.activeR.id, rifaNombre: window.activeR.nombre
-            };
-            if(!datos.nombre || !datos.ref) return alert("Completa los datos.");
-            await push(ref(db, 'pendientes'), datos);
-
-            const msgAdmin = `💎 *NUEVO REPORTE DE PAGO* 💎%0A%0A👤 *Cliente:* ${datos.nombre}%0A🆔 *Cédula:* ${datos.cedula}%0A🏆 *Sorteo:* ${datos.rifaNombre}%0A🎫 *Tickets:* ${selectedNumbers.join(' - ')}%0A💰 *Ref:* ${datos.ref}%0A%0A━━━━━━━━━━━━━━━━━━━━%0A✅ *Verifica en tu panel administrativo.*`;
-            window.open(`https://wa.me/${MI_WHATSAPP}?text=${msgAdmin}`, '_blank');
-            location.reload();
-        };
-
-        window.confirmarP = async (pId) => {
-            const p = (await get(ref(db, `pendientes/${pId}`))).val();
-            const rRef = ref(db, `rifas/${p.rifaId}`);
-            const rData = (await get(rRef)).val();
-            let curV = rData.vendidos ? rData.vendidos.split(',').filter(x=>x!=="") : [], newC = rData.compradores || {};
-            p.numeros.forEach(n => { if(!curV.includes(n)) { curV.push(n); newC[n] = p.nombre; } });
-            await update(rRef, { vendidos: curV.join(','), compradores: newC });
-            await remove(ref(db, `pendientes/${pId}`));
-
-            const msgCliente = `💎 *David%26DiegoCorporation* 💎%0A✨ *¡COMPRA CONFIRMADA!* ✨%0A%0A*Hola ${p.nombre}*, tu pago ha sido verificado.%0A%0A🎫 *TUS NÚMEROS:*%0A👉 *[ ${p.numeros.join(' ] - [ ')} ]*%0A%0A🏆 *SORTEO:* ${p.rifaNombre}%0A%0A🍀 *¡Mucha suerte en el sorteo!*%0A━━━━━━━━━━━━━━━━━━━━%0A📲 *¡Gracias por confiar en nosotros!*`;
-            window.open(`https://wa.me/${p.tel}?text=${msgCliente}`, '_blank');
-        };
-
+        // SYNC FIREBASE
         onValue(ref(db, 'rifas'), (snap) => {
             const list = document.getElementById('rifasList'), sel = document.getElementById('activeRifaSelect'), del = document.getElementById('listaBorrarRifas'), clientBody = document.getElementById('listaClientesBody');
             list.innerHTML = ""; sel.innerHTML = '<option value="">-- SELECCIONAR --</option>'; del.innerHTML = ""; clientBody.innerHTML = "";
@@ -217,7 +234,7 @@
 
         document.getElementById('btnLaunch').onclick = async () => {
             const n = document.getElementById('addNombre').value, p = document.getElementById('addPrecio').value, c = document.getElementById('addCantidad').value, f = document.getElementById('addFoto').files[0];
-            if(!n || !f) return alert("Faltan datos");
+            if(!n || !f) return alert("Datos incompletos.");
             const reader = new FileReader(); reader.readAsDataURL(f);
             reader.onload = async () => { await push(ref(db, 'rifas'), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: reader.result, vendidos: "", compradores: {} }); alert("Sorteo Lanzado"); };
         };
