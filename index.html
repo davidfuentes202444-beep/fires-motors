@@ -49,7 +49,7 @@
                 <div class="overflow-x-auto bg-white rounded-2xl border">
                     <table class="w-full text-[10px] text-left">
                         <thead class="bg-slate-100 uppercase italic">
-                            <tr><th class="p-3">Cliente</th><th class="p-3">Tickets</th><th class="p-3">Acción</th></tr>
+                            <tr><th class="p-3">Cliente</th><th class="p-3">Tickets</th><th class="p-3 text-center">Acción</th></tr>
                         </thead>
                         <tbody id="listaClientesBody" class="font-bold"></tbody>
                     </table>
@@ -58,13 +58,13 @@
 
             <div id="sec-crear" class="panel-seccion space-y-6">
                 <div class="p-4 bg-green-50 rounded-2xl border-2 border-green-200">
-                    <input type="text" id="addNombre" class="w-full p-2 mb-2 rounded-lg border" placeholder="Premio">
+                    <input type="text" id="addNombre" class="w-full p-2 mb-2 rounded-lg border font-bold" placeholder="Premio">
                     <div class="grid grid-cols-2 gap-2 mb-2">
                         <input type="number" id="addPrecio" class="p-2 rounded-lg border" placeholder="Precio Bs.">
                         <input type="number" id="addCantidad" class="p-2 rounded-lg border" placeholder="Cantidad">
                     </div>
                     <input type="file" id="addFoto" class="text-[10px] mb-2" accept="image/*">
-                    <button id="btnLaunch" class="w-full bg-slate-900 text-white font-black py-3 rounded-xl uppercase">Lanzar</button>
+                    <button id="btnLaunch" class="w-full bg-slate-900 text-white font-black py-3 rounded-xl uppercase">Lanzar Sorteo</button>
                 </div>
                 <div id="listaBorrarRifas" class="space-y-2"></div>
             </div>
@@ -88,12 +88,12 @@
                 <div id="selBox" class="flex flex-wrap justify-center gap-2 p-4 bg-slate-50 rounded-2xl border-2 border-dashed min-h-[60px]"></div>
                 <div id="totalLabel" class="text-3xl font-black text-center text-green-600">Bs. 0.00</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <input type="text" id="cNombre" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Nombre">
+                    <input type="text" id="cNombre" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Nombre Completo">
                     <input type="text" id="cCedula" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Cédula">
                     <input type="text" id="cTel" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="WhatsApp">
                     <input type="text" id="cRef" class="p-3 border-2 border-yellow-400 rounded-xl text-xs font-bold col-span-2 text-center" placeholder="REFERENCIA PAGO">
                 </div>
-                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl uppercase">Enviar Reporte</button>
+                <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl uppercase">Reportar Pago</button>
             </div>
         </div>
     </div>
@@ -110,7 +110,6 @@
 
         document.getElementById('masterLock').onclick = () => { if(prompt("Pass David&Diego:") === "051011") document.getElementById('adminArea').classList.toggle('hidden'); };
 
-        // BORRADO MANUAL DE CLIENTE Y LIBERACIÓN DE NÚMEROS
         window.liberarCliente = async (rifaId, clienteNombre) => {
             if(!confirm(`¿Eliminar a ${clienteNombre} y liberar sus números?`)) return;
             const rRef = ref(db, `rifas/${rifaId}`);
@@ -118,18 +117,10 @@
             const data = snap.val();
             let curV = data.vendidos.split(',').filter(x => x !== "");
             let newC = data.compradores || {};
-            
-            Object.keys(newC).forEach(num => {
-                if(newC[num] === clienteNombre) {
-                    curV = curV.filter(n => n !== num);
-                    delete newC[num];
-                }
-            });
-
+            Object.keys(newC).forEach(num => { if(newC[num] === clienteNombre) { curV = curV.filter(n => n !== num); delete newC[num]; } });
             await update(rRef, { vendidos: curV.join(','), compradores: newC });
         };
 
-        // COMPRA MÍNIMA 2
         document.getElementById('btnGenerar').onclick = () => {
             const cant = parseInt(document.getElementById('cantNums').value);
             if(cant < 2) return alert("La compra mínima es de 2 tickets.");
@@ -143,66 +134,19 @@
             document.getElementById('totalLabel').innerText = `Bs. ${(selectedNumbers.length * r.precio).toFixed(2)}`;
         };
 
-        // GESTIÓN RIFAS Y CLIENTES
-        onValue(ref(db, 'rifas'), (snap) => {
-            const list = document.getElementById('rifasList'), sel = document.getElementById('activeRifaSelect'), del = document.getElementById('listaBorrarRifas'), clientBody = document.getElementById('listaClientesBody');
-            list.innerHTML = ""; sel.innerHTML = '<option value="">-- SELECCIONAR --</option>'; del.innerHTML = ""; clientBody.innerHTML = "";
-            const data = snap.val(); if(!data) return;
-
-            Object.keys(data).forEach(id => {
-                const r = data[id];
-                sel.innerHTML += `<option value="${id}">${r.nombre}</option>`;
-                del.innerHTML += `<div class="flex justify-between bg-white p-2 rounded-lg border"><span>${r.nombre}</span><button onclick="remove(ref(db, 'rifas/${id}'))" class="text-red-500">Eliminar</button></div>`;
-                
-                if(r.compradores) {
-                    const ag = {}; Object.keys(r.compradores).forEach(n => { if(!ag[r.compradores[n]]) ag[r.compradores[n]] = []; ag[r.compradores[n]].push(n); });
-                    Object.keys(ag).forEach(c => {
-                        clientBody.innerHTML += `<tr class="border-b"><td class="p-3">${c}</td><td class="p-3">${ag[c].join(', ')}</td><td class="p-3 text-red-600" onclick="liberarCliente('${id}', '${c}')">BORRAR</td></tr>`;
-                    });
-                }
-
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-[2rem] shadow-lg p-4 text-center cursor-pointer";
-                card.innerHTML = `<img src="${r.imagen}" class="h-44 w-full object-cover rounded-2xl mb-2"><h3 class="font-black text-xs">${r.nombre}</h3><p class="text-blue-600 font-black">Bs. ${r.precio}</p>`;
-                card.onclick = () => { window.activeR = { ...r, id }; document.getElementById('buyModal').classList.remove('hidden'); };
-                list.appendChild(card);
-            });
-        });
-
-        // REPORTE DE PAGO
         document.getElementById('btnFinalizar').onclick = async () => {
             if(selectedNumbers.length < 2) return alert("Mínimo 2 tickets.");
             const datos = {
-                nombre: document.getElementById('cNombre').value.toUpperCase(), ref: document.getElementById('cRef').value, tel: document.getElementById('cTel').value,
+                nombre: document.getElementById('cNombre').value.toUpperCase(), cedula: document.getElementById('cCedula').value,
+                ref: document.getElementById('cRef').value, tel: document.getElementById('cTel').value,
                 numeros: selectedNumbers, rifaId: window.activeR.id, rifaNombre: window.activeR.nombre
             };
             if(!datos.nombre || !datos.ref) return alert("Completa los datos.");
             await push(ref(db, 'pendientes'), datos);
-            window.open(`https://wa.me/${MI_WHATSAPP}?text=💎 *REPORTE*%0A${datos.nombre}%0A${datos.rifaNombre}%0A*Tickets:* ${selectedNumbers.join(', ')}`, '_blank');
-            location.reload();
-        };
 
-        // MONITOR ADMIN
-        document.getElementById('activeRifaSelect').onchange = (e) => {
-            const id = e.target.value, grid = document.getElementById('adminGrid');
-            if(!id) return grid.innerHTML = "";
-            onValue(ref(db, `rifas/${id}`), (snap) => {
-                const r = snap.val(); if(!r) return;
-                grid.innerHTML = "";
-                let vArr = r.vendidos ? r.vendidos.split(',').filter(x=>x!=="") : [];
-                for(let i=0; i<r.cantidad; i++){
-                    const n = i.toString().padStart(r.cantidad.toString().length, '0'), isV = vArr.includes(n);
-                    const b = document.createElement('div');
-                    b.className = `num-box ${isV ? 'vendido' : 'disponible'}`; b.innerHTML = n;
-                    b.onclick = async () => {
-                        let nom = document.getElementById('adminSearch').value.toUpperCase();
-                        if(!nom || isV) return alert("Nombre de cliente necesario.");
-                        let curV = [...vArr, n], newC = r.compradores || {}; newC[n] = nom;
-                        await update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
-                    };
-                    grid.appendChild(b);
-                }
-            });
+            const msgAdmin = `💎 *NUEVO REPORTE DE PAGO* 💎%0A%0A👤 *Cliente:* ${datos.nombre}%0A🆔 *Cédula:* ${datos.cedula}%0A🏆 *Sorteo:* ${datos.rifaNombre}%0A🎫 *Tickets:* ${selectedNumbers.join(' - ')}%0A💰 *Ref:* ${datos.ref}%0A%0A━━━━━━━━━━━━━━━━━━━━%0A✅ *Verifica en tu panel administrativo.*`;
+            window.open(`https://wa.me/${MI_WHATSAPP}?text=${msgAdmin}`, '_blank');
+            location.reload();
         };
 
         window.confirmarP = async (pId) => {
@@ -213,7 +157,50 @@
             p.numeros.forEach(n => { if(!curV.includes(n)) { curV.push(n); newC[n] = p.nombre; } });
             await update(rRef, { vendidos: curV.join(','), compradores: newC });
             await remove(ref(db, `pendientes/${pId}`));
-            window.open(`https://wa.me/${p.tel}?text=✅ *CONFIRMADO* %0A${p.numeros.join(', ')}`, '_blank');
+
+            const msgCliente = `💎 *David%26DiegoCorporation* 💎%0A✨ *¡COMPRA CONFIRMADA!* ✨%0A%0A*Hola ${p.nombre}*, tu pago ha sido verificado.%0A%0A🎫 *TUS NÚMEROS:*%0A👉 *[ ${p.numeros.join(' ] - [ ')} ]*%0A%0A🏆 *SORTEO:* ${p.rifaNombre}%0A%0A🍀 *¡Mucha suerte en el sorteo!*%0A━━━━━━━━━━━━━━━━━━━━%0A📲 *¡Gracias por confiar en nosotros!*`;
+            window.open(`https://wa.me/${p.tel}?text=${msgCliente}`, '_blank');
+        };
+
+        onValue(ref(db, 'rifas'), (snap) => {
+            const list = document.getElementById('rifasList'), sel = document.getElementById('activeRifaSelect'), del = document.getElementById('listaBorrarRifas'), clientBody = document.getElementById('listaClientesBody');
+            list.innerHTML = ""; sel.innerHTML = '<option value="">-- SELECCIONAR --</option>'; del.innerHTML = ""; clientBody.innerHTML = "";
+            const data = snap.val(); if(!data) return;
+            Object.keys(data).forEach(id => {
+                const r = data[id];
+                sel.innerHTML += `<option value="${id}">${r.nombre}</option>`;
+                del.innerHTML += `<div class="flex justify-between bg-white p-2 rounded-lg border text-[10px] font-bold"><span>${r.nombre}</span><button onclick="remove(ref(db, 'rifas/${id}'))" class="text-red-500">Eliminar</button></div>`;
+                if(r.compradores) {
+                    const ag = {}; Object.keys(r.compradores).forEach(n => { if(!ag[r.compradores[n]]) ag[r.compradores[n]] = []; ag[r.compradores[n]].push(n); });
+                    Object.keys(ag).forEach(c => { clientBody.innerHTML += `<tr class="border-b"><td class="p-3">${c}</td><td class="p-3">${ag[c].join(', ')}</td><td class="p-3 text-red-600 text-center" onclick="liberarCliente('${id}', '${c}')"><i class="fas fa-trash"></i></td></tr>`; });
+                }
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-[2rem] shadow-lg p-4 text-center cursor-pointer";
+                card.innerHTML = `<img src="${r.imagen}" class="h-44 w-full object-cover rounded-2xl mb-2"><h3 class="font-black text-xs uppercase">${r.nombre}</h3><p class="text-blue-600 font-black">Bs. ${r.precio}</p>`;
+                card.onclick = () => { window.activeR = { ...r, id }; document.getElementById('buyModal').classList.remove('hidden'); };
+                list.appendChild(card);
+            });
+        });
+
+        document.getElementById('activeRifaSelect').onchange = (e) => {
+            const id = e.target.value, grid = document.getElementById('adminGrid');
+            if(!id) return grid.innerHTML = "";
+            onValue(ref(db, `rifas/${id}`), (snap) => {
+                const r = snap.val(); if(!r) return;
+                grid.innerHTML = "";
+                let vArr = r.vendidos ? r.vendidos.split(',').filter(x=>x!=="") : [];
+                for(let i=0; i<r.cantidad; i++){
+                    const n = i.toString().padStart(r.cantidad.toString().length, '0'), isV = vArr.includes(n);
+                    const b = document.createElement('div'); b.className = `num-box ${isV ? 'vendido' : 'disponible'}`; b.innerHTML = n;
+                    b.onclick = async () => {
+                        let nom = document.getElementById('adminSearch').value.toUpperCase();
+                        if(!nom || isV) return alert("Escribe nombre del cliente.");
+                        let curV = [...vArr, n], newC = r.compradores || {}; newC[n] = nom;
+                        await update(ref(db, `rifas/${id}`), { vendidos: curV.join(','), compradores: newC });
+                    };
+                    grid.appendChild(b);
+                }
+            });
         };
 
         onValue(ref(db, 'pendientes'), (snap) => {
@@ -223,7 +210,7 @@
                 const p = data[id];
                 c.innerHTML += `<div class="bg-slate-100 p-3 rounded-xl flex justify-between items-center border-l-4 border-yellow-500 mb-2">
                     <div class="text-[9px] font-bold"><p>${p.nombre}</p><p class="text-blue-600">${p.rifaNombre} [${p.numeros.join(', ')}]</p></div>
-                    <button onclick="confirmarP('${id}')" class="bg-green-600 text-white p-2 rounded-lg text-[8px] font-black">Aprobar</button>
+                    <button onclick="confirmarP('${id}')" class="bg-green-600 text-white p-2 rounded-lg text-[8px] font-black uppercase">Aprobar</button>
                 </div>`;
             });
         });
@@ -232,10 +219,7 @@
             const n = document.getElementById('addNombre').value, p = document.getElementById('addPrecio').value, c = document.getElementById('addCantidad').value, f = document.getElementById('addFoto').files[0];
             if(!n || !f) return alert("Faltan datos");
             const reader = new FileReader(); reader.readAsDataURL(f);
-            reader.onload = async () => {
-                await push(ref(db, 'rifas'), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: reader.result, vendidos: "", compradores: {} });
-                alert("Sorteo Lanzado");
-            };
+            reader.onload = async () => { await push(ref(db, 'rifas'), { nombre: n.toUpperCase(), precio: p, cantidad: parseInt(c), imagen: reader.result, vendidos: "", compradores: {} }); alert("Sorteo Lanzado"); };
         };
 
         window.verSeccion = (id) => { document.querySelectorAll('.panel-seccion').forEach(s => s.classList.remove('activa')); document.getElementById(id).classList.add('activa'); };
