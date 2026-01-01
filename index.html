@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .num-blur { filter: blur(5px); user-select: none; }
+        .num-blur { filter: blur(6px); user-select: none; pointer-events: none; }
         .grid-monitor { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 5px; max-height: 400px; overflow-y: auto; padding: 15px; border-radius: 1.5rem; }
         .num-box { font-size: 10px; font-weight: 900; text-align: center; padding: 8px 0; border-radius: 8px; color: white; cursor: pointer; }
         .disponible { background: #22c55e; border: 2px solid #16a34a; }
@@ -75,21 +75,21 @@
     <div id="buyModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/90 backdrop-blur-sm" onclick="closeModal()"></div>
         <div class="bg-white relative w-full max-w-lg rounded-[2.5rem] overflow-hidden flex flex-col max-h-[95vh] shadow-2xl">
-            <div class="bg-slate-900 p-4 text-white flex justify-between items-center font-black italic text-sm">
-                <span>COMPRA MÍNIMA: 2 TICKETS</span>
-                <button onclick="closeModal()">&times;</button>
+            <div class="bg-slate-900 p-4 text-white flex justify-between items-center font-black italic text-sm text-center">
+                <span>COMPRA MÍNIMA: 2 TICKETS <br> (Números ocultos hasta confirmar)</span>
+                <button onclick="closeModal()" class="text-2xl">&times;</button>
             </div>
-            <div class="p-6 overflow-y-auto space-y-4">
+            <div class="p-6 overflow-y-auto space-y-4 text-center">
                 <div class="flex gap-2">
                     <input type="number" id="cantNums" value="2" min="2" class="w-16 p-2 rounded-xl border-2 border-purple-400 font-black text-center">
-                    <button id="btnGenerar" class="flex-1 bg-purple-600 text-white rounded-xl font-black uppercase text-xs">Generar Tickets</button>
+                    <button id="btnGenerar" class="flex-1 bg-purple-600 text-white rounded-xl font-black uppercase text-xs">Asignar Tickets Azar</button>
                 </div>
-                <div id="selBox" class="flex flex-wrap justify-center gap-2 p-4 bg-slate-50 rounded-2xl border-2 border-dashed min-h-[60px]"></div>
-                <div id="totalLabel" class="text-3xl font-black text-center text-green-600">Bs. 0.00</div>
+                <div id="selBox" class="flex flex-wrap justify-center gap-2 p-4 bg-slate-100 rounded-2xl border-2 border-dashed min-h-[60px]"></div>
+                <div id="totalLabel" class="text-3xl font-black text-green-600">Bs. 0.00</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <input type="text" id="cNombre" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Nombre Completo">
                     <input type="text" id="cCedula" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="Cédula">
-                    <input type="text" id="cTel" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="WhatsApp">
+                    <input type="text" id="cTel" class="p-3 bg-slate-100 rounded-xl text-xs font-bold" placeholder="WhatsApp (Ej: 584120000000)">
                     <input type="text" id="cRef" class="p-3 border-2 border-yellow-400 rounded-xl text-xs font-bold col-span-2 text-center" placeholder="REFERENCIA PAGO">
                 </div>
                 <button id="btnFinalizar" class="w-full bg-green-600 text-white font-black py-4 rounded-2xl uppercase shadow-lg">Reportar Pago</button>
@@ -109,7 +109,7 @@
 
         document.getElementById('masterLock').onclick = () => { if(prompt("Pass David&Diego:") === "051011") document.getElementById('adminArea').classList.toggle('hidden'); };
 
-        // REPORTE DEL CLIENTE (Mínimo 2 tickets + Redirección directa)
+        // 1. REPORTE DEL CLIENTE (ELLOS NO VEN LOS NÚMEROS EN EL MENSAJE)
         document.getElementById('btnFinalizar').onclick = async () => {
             if(selectedNumbers.length < 2) return alert("La compra mínima es de 2 tickets.");
             const n = document.getElementById('cNombre').value.toUpperCase();
@@ -117,7 +117,7 @@
             const r = document.getElementById('cRef').value;
             const t = document.getElementById('cTel').value;
 
-            if(!n || !r || !t) return alert("Nombre, WhatsApp y Referencia son obligatorios.");
+            if(!n || !r || !t) return alert("Completa Nombre, WhatsApp y Referencia.");
 
             const datos = {
                 nombre: n, cedula: ced, ref: r, tel: t,
@@ -126,13 +126,14 @@
 
             await push(ref(db, 'pendientes'), datos);
 
-            const texto = `💎 *NUEVO REPORTE DE PAGO* 💎%0A%0A👤 *Cliente:* ${n}%0A🆔 *Cédula:* ${ced}%0A🏆 *Sorteo:* ${datos.rifaNombre}%0A🎫 *Tickets:* ${selectedNumbers.join(' - ')}%0A💰 *Ref:* ${r}%0A%0A━━━━━━━━━━━━━━━━━━━━%0A✅ *Verifica en el panel administrativo.*`;
+            // Mensaje para el ADMIN (Aquí sí van los números para que tú los sepas)
+            const textoAdmin = encodeURIComponent(`💎 *NUEVO REPORTE DE PAGO* 💎\n\n👤 *Cliente:* ${n}\n🆔 *Cédula:* ${ced}\n🏆 *Sorteo:* ${datos.rifaNombre}\n🎫 *Tickets Solicitados:* ${selectedNumbers.join(' - ')}\n💰 *Ref:* ${r}\n\n━━━━━━━━━━━━━━━━━━━━\n✅ *Verifica en tu panel para confirmar los números al cliente.*`);
             
-            alert("Reporte guardado. Pulsa OK para notificar por WhatsApp.");
-            window.location.href = `https://api.whatsapp.com/send?phone=${MI_WHATSAPP}&text=${texto}`;
+            alert("Reporte enviado con éxito. Serás redirigido a WhatsApp para notificar al administrador.");
+            window.location.href = `https://api.whatsapp.com/send?phone=${MI_WHATSAPP}&text=${textoAdmin}`;
         };
 
-        // CONFIRMACIÓN DEL ADMIN (Al cliente)
+        // 2. CONFIRMACIÓN DEL ADMIN AL CLIENTE (AQUÍ SÍ SE LE ENTREGAN LOS NÚMEROS)
         window.confirmarP = async (pId) => {
             const pSnap = await get(ref(db, `pendientes/${pId}`));
             const p = pSnap.val();
@@ -142,17 +143,17 @@
             
             let curV = rData.vendidos ? rData.vendidos.split(',').filter(x=>x!=="") : [];
             let newC = rData.compradores || {};
-            p.numeros.forEach(n => { if(!curV.includes(n)) { curV.push(n); newC[n] = p.nombre; } });
+            p.numeros.forEach(num => { if(!curV.includes(num)) { curV.push(num); newC[num] = p.nombre; } });
 
             await update(rRef, { vendidos: curV.join(','), compradores: newC });
             await remove(ref(db, `pendientes/${pId}`));
 
-            const textoCliente = `💎 *David Diego Corporation* 💎%0A✨ *¡COMPRA CONFIRMADA!* ✨%0A%0AHola *${p.nombre}*, tu pago ha sido verificado con éxito.%0A%0A🎫 *TUS NÚMEROS:*%0A👉 *[ ${p.numeros.join(' ] - [ ')} ]*%0A%0A🏆 *SORTEO:* ${p.rifaNombre}%0A%0A🍀 *¡Mucha suerte!*%0A━━━━━━━━━━━━━━━━━━━━%0A📲 *Gracias por tu confianza.*`;
+            const textoCliente = encodeURIComponent(`💎 *David Diego Corporation* 💎\n✨ *¡COMPRA CONFIRMADA!* ✨\n\nHola *${p.nombre}*, tu pago ha sido verificado con éxito.\n\n🎫 *TUS NÚMEROS OFICIALES:*\n👉 *[ ${p.numeros.join(' ] - [ ')} ]*\n\n🏆 *SORTEO:* ${p.rifaNombre}\n\n🍀 *¡Mucha suerte en el sorteo!*\n━━━━━━━━━━━━━━━━━━━━\n📲 *Gracias por tu confianza.*`);
             
             window.location.href = `https://api.whatsapp.com/send?phone=${p.tel}&text=${textoCliente}`;
         };
 
-        // LIBERAR CLIENTE MANUALMENTE
+        // GESTIÓN DE CLIENTES Y SORTEOS
         window.liberarCliente = async (rifaId, clienteNombre) => {
             if(!confirm(`¿Eliminar a ${clienteNombre} y liberar sus números?`)) return;
             const rRef = ref(db, `rifas/${rifaId}`);
@@ -164,7 +165,6 @@
             await update(rRef, { vendidos: curV.join(','), compradores: newC });
         };
 
-        // GENERAR TICKETS
         document.getElementById('btnGenerar').onclick = () => {
             const cant = parseInt(document.getElementById('cantNums').value);
             if(cant < 2) return alert("Mínimo 2 tickets.");
@@ -174,11 +174,11 @@
                 let n = Math.floor(Math.random() * r.cantidad).toString().padStart(r.cantidad.toString().length, '0');
                 if(!vArr.includes(n) && !selectedNumbers.includes(n)) selectedNumbers.push(n);
             }
+            // Los números se muestran difuminados al cliente
             document.getElementById('selBox').innerHTML = selectedNumbers.map(n => `<span class="bg-blue-600 text-white px-3 py-1 rounded-lg font-black num-blur">#${n}</span>`).join('');
             document.getElementById('totalLabel').innerText = `Bs. ${(selectedNumbers.length * r.precio).toFixed(2)}`;
         };
 
-        // SYNC FIREBASE
         onValue(ref(db, 'rifas'), (snap) => {
             const list = document.getElementById('rifasList'), sel = document.getElementById('activeRifaSelect'), del = document.getElementById('listaBorrarRifas'), clientBody = document.getElementById('listaClientesBody');
             list.innerHTML = ""; sel.innerHTML = '<option value="">-- SELECCIONAR --</option>'; del.innerHTML = ""; clientBody.innerHTML = "";
